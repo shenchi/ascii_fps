@@ -1,0 +1,46 @@
+#include "PixelEmitter.h"
+#include "Pipeline.h"
+#include "Shader.h"
+
+#define x1 screenPosisions[0]
+#define y1 screenPosisions[1]
+#define x2 screenPosisions[2]
+#define y2 screenPosisions[3]
+#define x3 screenPosisions[4]
+#define y3 screenPosisions[5]
+
+PixelEmitter::PixelEmitter(const float* screenPosisions, float* pixelDataBlock, const Shader* pixelShader, IColorBufferAdaptor* adaptor)
+	:
+	screenPosisions(screenPosisions),
+	pixelDataBlock(pixelDataBlock),
+	pixelShader(pixelShader),
+	stride(pixelShader->Stride()),
+	adaptor(adaptor)
+{
+	y2_3 = y2 - y3;
+	x3_2 = x3 - x2;
+	y3_1 = y3 - y1;
+	x1_3 = x1 - x3;
+
+	det = y2_3 * x1_3 - x3_2 * y3_1;
+}
+
+void PixelEmitter::EmitPixel(int x, int y)
+{
+	float* p1 = pixelDataBlock;
+	float* p2 = p1 + stride;
+	float* p3 = p2 + stride;
+	float* data = p3 + stride;
+
+	float a = (y2_3 * (x - x3) + x3_2 * (y - y3)) / det;
+	float b = (y3_1 * (x - x3) + x1_3 * (y - y3)) / det;
+	float c = 1.0f - a - b;
+
+	for (size_t i = 0; i < stride; ++i)
+	{
+		data[i] = a * p1[i] + b * p2[i] + c * p3[i];
+	}
+
+	pixelShader->Main(data, outputColor);
+	adaptor->WriteRenderTarget(x, y, outputColor);
+}
