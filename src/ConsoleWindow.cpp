@@ -2,7 +2,6 @@
 #include <Windows.h>
 
 static const int BUFFER_COUNT = 2;
-static const int INPUT_BUFFER_LENGTH = 256;
 
 #ifdef _DEBUG
 #define STRINGIFY(x) #x
@@ -22,7 +21,6 @@ struct ConsoleWindow::ConsoleWindowDatas
 	SMALL_RECT		screenRect;
 	CHAR_INFO*		buffers[BUFFER_COUNT];
 	CHAR_INFO*		buffer;
-	INPUT_RECORD	inputBuffer[INPUT_BUFFER_LENGTH];
 	unsigned char	keyStates[256];
 };
 
@@ -170,7 +168,7 @@ int ConsoleWindow::Update()
 	return 0;
 }
 
-int ConsoleWindow::Clear(unsigned int color)
+int ConsoleWindow::Clear(unsigned short color)
 {
 	if (nullptr == datas)
 	{

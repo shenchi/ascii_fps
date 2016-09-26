@@ -7,6 +7,9 @@ Pipeline::Pipeline(Rasterizer* rasterizer, IColorBufferAdaptor* adaptor)
 	:
 	rasterizer(rasterizer),
 	colorBufferAdaptor(adaptor),
+	bufferWidth(adaptor->GetBufferWidth()),
+	bufferHeight(adaptor->GetBufferHeight()),
+	depthBuffer(new float[bufferWidth * bufferHeight]),
 	vertexShader(nullptr),
 	pixelShader(nullptr),
 	vertexDataStride(0),
@@ -15,7 +18,7 @@ Pipeline::Pipeline(Rasterizer* rasterizer, IColorBufferAdaptor* adaptor)
 {
 	SetVertexShader(nullptr);
 	SetPixelShader(nullptr);
-	SetViewport(0, 0, adaptor->GetBufferWidth(), adaptor->GetBufferHeight());
+	SetViewport(0, 0, bufferWidth, bufferHeight);
 }
 
 
@@ -24,6 +27,23 @@ Pipeline::~Pipeline()
 	if (nullptr != pixelDataBlock)
 	{
 		delete[] pixelDataBlock;
+	}
+
+	delete[] depthBuffer;
+}
+
+void Pipeline::Clear(const float * color, float depth)
+{
+	colorBufferAdaptor->ClearColorBuffer(color);
+	ClearDepthBuffer(depth);
+}
+
+void Pipeline::ClearDepthBuffer(float depth)
+{
+	size_t len = bufferWidth * bufferHeight;
+	for (size_t i = 0; i < len; ++i)
+	{
+		depthBuffer[i] = depth;
 	}
 }
 
@@ -76,14 +96,6 @@ static bool IsCW(float* v1, float* v2, float* v3)
 	return (dx2_1 * dy3_1 - dy2_1 * dx3_1 > 0);
 }
 
-//static inline void Normalize(float* v)
-//{
-//	v[0] /= v[3];
-//	v[1] /= v[3];
-//	v[2] /= v[3];
-//	v[3] = 1.0f;
-//}
-
 int Pipeline::Draw(const float* vertices, size_t numVertices, const size_t* indices, size_t numIndices)
 {
 	if (numIndices % 3 != 0)
@@ -113,10 +125,6 @@ int Pipeline::Draw(const float* vertices, size_t numVertices, const size_t* indi
 			continue;
 		}
 
-		//Normalize(v1_out);
-		//Normalize(v2_out);
-		//Normalize(v3_out);
-
 		screenPositions[0] = (viewportXScale * (v1_out[0] / v1_out[3]) + viewportXOffset);
 		screenPositions[1] = (-viewportYScale * (v1_out[1] / v1_out[3]) + viewportYOffset);
 		screenPositions[2] = (viewportXScale * (v2_out[0] / v2_out[3]) + viewportXOffset);
@@ -124,10 +132,20 @@ int Pipeline::Draw(const float* vertices, size_t numVertices, const size_t* indi
 		screenPositions[4] = (viewportXScale * (v3_out[0] / v3_out[3]) + viewportXOffset);
 		screenPositions[5] = (-viewportYScale * (v3_out[1] / v3_out[3]) + viewportYOffset);
 
-		PixelEmitter emitter(screenPositions, pixelDataBlock, pixelShader, colorBufferAdaptor);
+		PixelEmitter emitter(this, screenPositions);
 
 		rasterizer->RasterizeTriangle(screenPositions, &emitter);
 	}
 
 	return 0;
+}
+
+bool Pipeline::ZTest(int x, int y, float z)
+{
+	if (z < depthBuffer[x + y * bufferWidth])
+	{
+		depthBuffer[x + y * bufferWidth] = z;
+		return true;
+	}
+	return false;
 }

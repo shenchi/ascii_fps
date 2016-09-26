@@ -1,6 +1,7 @@
 #include "PixelEmitter.h"
 #include "Pipeline.h"
 #include "Shader.h"
+#include "DepthControl.h"
 
 #define x1 screenPosisions[0]
 #define y1 screenPosisions[1]
@@ -9,13 +10,11 @@
 #define x3 screenPosisions[4]
 #define y3 screenPosisions[5]
 
-PixelEmitter::PixelEmitter(const float* screenPosisions, float* pixelDataBlock, const Shader* pixelShader, IColorBufferAdaptor* adaptor)
+PixelEmitter::PixelEmitter(Pipeline* pipeline, const float* screenPosisions)
 	:
+	pipeline(pipeline),
 	screenPosisions(screenPosisions),
-	pixelDataBlock(pixelDataBlock),
-	pixelShader(pixelShader),
-	stride(pixelShader->Stride()),
-	adaptor(adaptor)
+	stride(pipeline->pixelShader->Stride())
 {
 	y2_3 = y2 - y3;
 	x3_2 = x3 - x2;
@@ -27,7 +26,7 @@ PixelEmitter::PixelEmitter(const float* screenPosisions, float* pixelDataBlock, 
 
 void PixelEmitter::EmitPixel(int x, int y)
 {
-	float* p1 = pixelDataBlock;
+	float* p1 = pipeline->pixelDataBlock;
 	float* p2 = p1 + stride;
 	float* p3 = p2 + stride;
 	float* data = p3 + stride;
@@ -36,11 +35,22 @@ void PixelEmitter::EmitPixel(int x, int y)
 	float b = (y3_1 * (x - x3) + x1_3 * (y - y3)) / det;
 	float c = 1.0f - a - b;
 
-	for (size_t i = 0; i < stride; ++i)
+	for (size_t i = 0; i < 4; ++i)
 	{
 		data[i] = a * p1[i] + b * p2[i] + c * p3[i];
 	}
 
-	pixelShader->Main(data, outputColor);
-	adaptor->WriteRenderTarget(x, y, outputColor);
+	float z = data[2] / data[3] * 0.5f + 0.5f;
+	if (!pipeline->ZTest(x, y, z))
+	{
+		return;
+	}
+
+	for (size_t i = 4; i < stride; ++i)
+	{
+		data[i] = a * p1[i] + b * p2[i] + c * p3[i];
+	}
+
+	pipeline->pixelShader->Main(data, outputColor);
+	pipeline->colorBufferAdaptor->WriteRenderTarget(x, y, outputColor);
 }

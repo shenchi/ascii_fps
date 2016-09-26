@@ -1,21 +1,21 @@
 #pragma once
 
 class IColorBufferAdaptor;
+class Pipeline;
 class Shader;
+class DepthControl;
 
 class PixelEmitter
 {
 public:
-	PixelEmitter(const float* screenPosisions, float* pixelDataBlock, const Shader* pixelShader, IColorBufferAdaptor* adaptor);
+	PixelEmitter(Pipeline* pipeline, const float* screenPosisions);
 
 	void EmitPixel(int x, int y);
 
 private:
+	Pipeline*				pipeline;
 	const float*			screenPosisions;
-	float*					pixelDataBlock;
-	const Shader*			pixelShader;
 	size_t					stride;
-	IColorBufferAdaptor*	adaptor;
 	float					outputColor[4];
 
 	float					det;

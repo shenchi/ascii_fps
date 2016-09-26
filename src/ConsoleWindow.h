@@ -13,7 +13,7 @@ public:
 
 	int		Update();
 
-	int		Clear(unsigned int color);
+	int		Clear(unsigned short color);
 
 	int		SwapBuffers();
 	int		Flush();

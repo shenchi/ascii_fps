@@ -16,9 +16,9 @@ class Adaptor : public IColorBufferAdaptor
 public:
 	Adaptor(ConsoleWindow* window) : window(window) {}
 
-	virtual void WriteRenderTarget(int x, int y, float* color)
+	virtual void WriteRenderTarget(int x, int y, const float* color)
 	{
-		unsigned int col = 8;
+		unsigned short col = 8;
 		if (color[0] > 0.5f) col |= 4;
 		if (color[1] > 0.5f) col |= 2;
 		if (color[2] > 0.5f) col |= 1;
@@ -35,6 +35,15 @@ public:
 		return window->GetBufferHeight();
 	}
 
+	virtual void ClearColorBuffer(const float* color)
+	{
+		unsigned short col = 0;
+		if (color[0] > 0.5f) col |= 4;
+		if (color[1] > 0.5f) col |= 2;
+		if (color[2] > 0.5f) col |= 1;
+		window->Clear(col);
+	}
+
 private:
 	ConsoleWindow* window;
 };
@@ -47,12 +56,12 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR pCmdLin
 	bufferWidth = window.GetBufferWidth();
 	bufferHeight = window.GetBufferHeight();
 
-	Adaptor adaptor(&window);
+	Adaptor* adaptor = new Adaptor(&window);
 	Rasterizer raster(bufferWidth, bufferHeight);
-	Pipeline pipeline(&raster, &adaptor);
+	Pipeline pipeline(&raster, adaptor);
 
 #pragma region data
-	float triangle_vertices[] =
+	float vertices[] =
 	{
 		-0.5f, -0.5f, -0.5f, 1.0f,
 		-0.5f,  0.5f, -0.5f, 1.0f,
@@ -63,9 +72,9 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR pCmdLin
 		 0.5f, -0.5f, 0.5f, 1.0f,
 		 0.5f,  0.5f, 0.5f, 1.0f,
 	};
-	size_t num_vertices = sizeof(triangle_vertices) / sizeof(float) / 4;
+	size_t num_vertices = sizeof(vertices) / sizeof(float) / 4;
 
-	size_t triangle_indices[] =
+	size_t indices[] =
 	{
 		0, 1, 2,
 		2, 1, 3,
@@ -85,13 +94,15 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR pCmdLin
 		4, 0, 6,
 		6, 0, 2
 	};
-	size_t num_indices = sizeof(triangle_indices) / sizeof(size_t);
+	size_t num_indices = sizeof(indices) / sizeof(size_t);
 
 	glm::mat4 matRotate(1.0f);
 	glm::mat4 matTranslate = glm::translate(glm::vec3(0.0f, 0.0f, 5.0f));
-	glm::mat4 matProj = glm::perspective(45.0f, 0.5f * bufferWidth / bufferHeight, 0.01f, 10.0f);
+	glm::mat4 matTranslate2 = glm::translate(glm::vec3(1.0f, 0.0f, 6.0f));
+	glm::mat4 matProj = glm::perspective(3.14159265f / 3, 0.5f * bufferWidth / bufferHeight, 0.001f, 10.0f);
 
 	float t = 0.0f;
+	float backgroundColor[] = { 0.0f, 0.0f, 0.0f, 1.0f };
 #pragma endregion
 
 	float interval = 0.016f;
@@ -117,14 +128,19 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR pCmdLin
 
 		window.Update();
 
-		window.Clear(0);
+		pipeline.Clear(backgroundColor, 1.0f);
 
 		t += deltaTime;
 		matRotate = glm::rotate(3.1415f * 0.5f * t, glm::vec3(1.0f, 1.0f, 1.0f));
 		glm::mat4 matMVP = matProj * matTranslate * matRotate;
 		pipeline.SetConstantBuffer(reinterpret_cast<float*>(&matMVP));
 
-		pipeline.Draw(triangle_vertices, num_vertices, triangle_indices, num_indices);
+		pipeline.Draw(vertices, num_vertices, indices, num_indices);
+
+		matMVP = matProj * matTranslate2 * matRotate;
+		pipeline.SetConstantBuffer(reinterpret_cast<float*>(&matMVP));
+
+		pipeline.Draw(vertices, num_vertices, indices, num_indices);
 
 		window.Flush();
 		window.SwapBuffers();
