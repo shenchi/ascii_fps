@@ -1,5 +1,7 @@
 #pragma once
 
+struct ConsoleWindowDatas;
+
 class ConsoleWindow
 {
 public:
@@ -22,12 +24,14 @@ public:
 
 	bool	IsKeyDown(unsigned char vkCode) const;
 
+	void	GetMousePosition(int& x, int& y) const;
+	int		GetMousePositionX() const;
+	int		GetMousePositionY() const;
+
 	short	GetBufferWidth() const;
 	short	GetBufferHeight() const;
 
 private:
-	struct ConsoleWindowDatas;
-
 	short	fontWidth;
 	short	fontHeight;
 

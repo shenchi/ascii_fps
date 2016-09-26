@@ -1,7 +1,6 @@
 #include "PixelEmitter.h"
 #include "Pipeline.h"
 #include "Shader.h"
-#include "DepthControl.h"
 
 #define x1 screenPosisions[0]
 #define y1 screenPosisions[1]

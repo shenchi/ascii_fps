@@ -6,12 +6,12 @@ static const int BUFFER_COUNT = 2;
 #ifdef _DEBUG
 #define STRINGIFY(x) #x
 #define FILE_AND_LINE(x) __FILE__ ":" STRINGIFY(x)
-#define CHECK(x) if (!(x)) { MessageBoxA(nullptr, FILE_AND_LINE(__LINE__), "Error", MB_OK); return GetLastError(); }
+#define CHECK(x) if (!(x)) { int ret = GetLastError(); MessageBoxA(nullptr, FILE_AND_LINE(__LINE__), "Error", MB_OK); return ret; }
 #else
 #define CHECK(x) if (!(x)) { return GetLastError(); }
 #endif
 
-struct ConsoleWindow::ConsoleWindowDatas
+struct ConsoleWindowDatas
 {
 	HWND			hWnd;
 	HANDLE			hStdout;
@@ -21,8 +21,42 @@ struct ConsoleWindow::ConsoleWindowDatas
 	SMALL_RECT		screenRect;
 	CHAR_INFO*		buffers[BUFFER_COUNT];
 	CHAR_INFO*		buffer;
-	unsigned char	keyStates[256];
+	WNDPROC			pWndProc;
+	int				mousePosX;
+	int				mousePosY;
 };
+
+namespace
+{
+	ConsoleWindowDatas* gWndDatas = nullptr;
+
+	LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+	{
+		switch (uMsg)
+		{
+		case WM_INPUT:
+		{
+			UINT dwSize = 40;
+			static BYTE lpb[40];
+
+			GetRawInputData((HRAWINPUT)lParam, RID_INPUT,
+				lpb, &dwSize, sizeof(RAWINPUTHEADER));
+
+			RAWINPUT* raw = (RAWINPUT*)lpb;
+
+			if (raw->header.dwType == RIM_TYPEMOUSE)
+			{
+				gWndDatas->mousePosX += raw->data.mouse.lLastX;
+				gWndDatas->mousePosY += raw->data.mouse.lLastY;
+			}
+			break;
+		}
+		default:
+			break;
+		}
+		return gWndDatas->pWndProc(hWnd, uMsg, wParam, lParam);
+	}
+}
 
 ConsoleWindow::ConsoleWindow()
 	:
@@ -32,12 +66,12 @@ ConsoleWindow::ConsoleWindow()
 
 int ConsoleWindow::Create(const wchar_t* title, short _bufferWidth, short _bufferHeight, short _fontWidth, short _fontHeight)
 {
-	if (nullptr != datas)
+	if (nullptr != datas || nullptr != gWndDatas)
 	{
 		return -1;
 	}
 
-	datas = new ConsoleWindowDatas();
+	datas = new ConsoleWindowDatas{};
 
 	bufferWidth = _bufferWidth;
 	bufferHeight = _bufferHeight;
@@ -117,6 +151,20 @@ int ConsoleWindow::Create(const wchar_t* title, short _bufferWidth, short _buffe
 		}
 	}
 
+	{
+		gWndDatas = datas;
+		datas->pWndProc = (WNDPROC)GetWindowLongPtr(datas->hWnd, GWLP_WNDPROC);
+		SetWindowLongPtr(datas->hWnd, GWLP_WNDPROC, (LONG_PTR)WndProc);
+
+		RAWINPUTDEVICE rawInputDevice = {};
+		rawInputDevice.usUsagePage = 1;
+		rawInputDevice.usUsage = 2;
+		rawInputDevice.hwndTarget = datas->hWnd;
+		rawInputDevice.dwFlags = RIDEV_INPUTSINK;// RIDEV_CAPTUREMOUSE;
+		CHECK(RegisterRawInputDevices(&rawInputDevice, 1, sizeof(RAWINPUTDEVICE)));
+		DWORD ret = GetLastError();
+	}
+
 	return 0;
 }
 
@@ -137,6 +185,8 @@ int ConsoleWindow::Destroy()
 	CHECK(FreeConsole());
 
 	delete datas;
+
+	gWndDatas = nullptr;
 
 	return 0;
 }
@@ -229,6 +279,22 @@ void ConsoleWindow::SetColor(short x, short y, unsigned int color)
 bool ConsoleWindow::IsKeyDown(unsigned char vkCode) const
 {
 	return ((GetAsyncKeyState(vkCode) & 0x8000) != 0);
+}
+
+void ConsoleWindow::GetMousePosition(int & x, int & y) const
+{
+	x = datas->mousePosX;
+	y = datas->mousePosY;
+}
+
+int ConsoleWindow::GetMousePositionX() const
+{
+	return datas->mousePosX;
+}
+
+int ConsoleWindow::GetMousePositionY() const
+{
+	return datas->mousePosY;
 }
 
 short ConsoleWindow::GetBufferWidth() const

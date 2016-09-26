@@ -50,8 +50,8 @@ private:
 
 int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR pCmdLine, int nCmdShow)
 {
-	window.Create(L"Test Console API", 800 / 4, 600 / 8, 4, 8);	// low res
-	//window.Create(L"Test Console API", 1200 / 3, 900 / 6, 3, 6);	// high res
+	int ret = window.Create(L"Test Console API", 800 / 4, 600 / 8, 4, 8);		// low res
+	//int ret = window.Create(L"Test Console API", 1200 / 3, 900 / 6, 3, 6);	// high res
 
 	bufferWidth = window.GetBufferWidth();
 	bufferHeight = window.GetBufferHeight();
@@ -123,7 +123,7 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR pCmdLin
 		lastTime = now;
 		elapsed = deltaTime + elapsed - interval;
 
-		sprintf_s(title, "%.4f", deltaTime);
+		sprintf_s(title, "%.4f (%7d, %7d)", deltaTime, window.GetMousePositionX(), window.GetMousePositionY());
 		window.SetTitleA(title);
 
 		window.Update();
