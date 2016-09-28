@@ -15,7 +15,13 @@
       <Filter>Engine\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="..\src\ConsoleWindow.cpp">
-      <Filter>Engine</Filter>
+      <Filter>Engine\Win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\MouseInputReceiver.cpp">
+      <Filter>Engine\Win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\AsciiGrayScale.cpp">
+      <Filter>Engine\Utils</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -32,7 +38,16 @@
       <Filter>Engine\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="..\src\ConsoleWindow.h">
-      <Filter>Engine</Filter>
+      <Filter>Engine\Win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\MouseInputReceiver.h">
+      <Filter>Engine\Win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\WinAPIDebug.h">
+      <Filter>Engine\Win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\AsciiGrayScale.h">
+      <Filter>Engine\Utils</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -41,6 +56,12 @@
     </Filter>
     <Filter Include="Engine\Renderer">
       <UniqueIdentifier>{c756bd54-5889-451e-b212-29d919112386}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Win32">
+      <UniqueIdentifier>{00a71379-d598-44b4-9b74-92a753501c64}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Utils">
+      <UniqueIdentifier>{7cb2a0d8-dfe3-443e-8d49-6b28a260851a}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

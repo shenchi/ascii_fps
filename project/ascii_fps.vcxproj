@@ -146,19 +146,24 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\src\AsciiGrayScale.cpp" />
     <ClCompile Include="..\src\ConsoleWindow.cpp" />
     <ClCompile Include="..\src\main.cpp" />
+    <ClCompile Include="..\src\MouseInputReceiver.cpp" />
     <ClCompile Include="..\src\Pipeline.cpp" />
     <ClCompile Include="..\src\PixelEmitter.cpp" />
     <ClCompile Include="..\src\Rasterizer.cpp" />
     <ClCompile Include="..\src\Shader.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\src\AsciiGrayScale.h" />
     <ClInclude Include="..\src\ConsoleWindow.h" />
+    <ClInclude Include="..\src\MouseInputReceiver.h" />
     <ClInclude Include="..\src\Pipeline.h" />
     <ClInclude Include="..\src\PixelEmitter.h" />
     <ClInclude Include="..\src\Rasterizer.h" />
     <ClInclude Include="..\src\Shader.h" />
+    <ClInclude Include="..\src\WinAPIDebug.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

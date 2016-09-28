@@ -1,10 +1,11 @@
-#include "ConsoleWindow.h"
-#include "Rasterizer.h"
-#include "Pipeline.h"
 #include <Windows.h>
 #include <chrono>
 #include <glm/glm.hpp>
 #include <glm/gtx/transform.hpp>
+#include "ConsoleWindow.h"
+#include "Rasterizer.h"
+#include "Pipeline.h"
+#include "AsciiGrayScale.h"
 
 typedef std::chrono::high_resolution_clock timer;
 
@@ -18,11 +19,10 @@ public:
 
 	virtual void WriteRenderTarget(int x, int y, const float* color)
 	{
-		unsigned short col = 8;
-		if (color[0] > 0.5f) col |= 4;
-		if (color[1] > 0.5f) col |= 2;
-		if (color[2] > 0.5f) col |= 1;
-		window->SetColor(static_cast<short>(x), static_cast<short>(y), col);
+		unsigned short col;
+		char ascii;
+		AsciiGrayScale::ConvertRGBToAscii(color, ascii, col);
+		window->SetColor(static_cast<short>(x), static_cast<short>(y), col, ascii);
 	}
 
 	virtual int GetBufferWidth() const
@@ -99,7 +99,7 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR pCmdLin
 	glm::mat4 matRotate(1.0f);
 	glm::mat4 matTranslate = glm::translate(glm::vec3(0.0f, 0.0f, 5.0f));
 	glm::mat4 matTranslate2 = glm::translate(glm::vec3(1.0f, 0.0f, 6.0f));
-	glm::mat4 matProj = glm::perspective(3.14159265f / 3, 0.5f * bufferWidth / bufferHeight, 0.001f, 10.0f);
+	glm::mat4 matProj = glm::perspective(3.14159265f / 6, 0.5f * bufferWidth / bufferHeight, 0.001f, 10.0f);
 
 	float t = 0.0f;
 	float backgroundColor[] = { 0.0f, 0.0f, 0.0f, 1.0f };

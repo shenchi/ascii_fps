@@ -1,15 +1,9 @@
 #include "ConsoleWindow.h"
 #include <Windows.h>
+#include "WinAPIDebug.h"
+#include "MouseInputReceiver.h"
 
 static const int BUFFER_COUNT = 2;
-
-#ifdef _DEBUG
-#define STRINGIFY(x) #x
-#define FILE_AND_LINE(x) __FILE__ ":" STRINGIFY(x)
-#define CHECK(x) if (!(x)) { int ret = GetLastError(); MessageBoxA(nullptr, FILE_AND_LINE(__LINE__), "Error", MB_OK); return ret; }
-#else
-#define CHECK(x) if (!(x)) { return GetLastError(); }
-#endif
 
 struct ConsoleWindowDatas
 {
@@ -26,38 +20,6 @@ struct ConsoleWindowDatas
 	int				mousePosY;
 };
 
-namespace
-{
-	ConsoleWindowDatas* gWndDatas = nullptr;
-
-	LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
-	{
-		switch (uMsg)
-		{
-		case WM_INPUT:
-		{
-			UINT dwSize = 40;
-			static BYTE lpb[40];
-
-			GetRawInputData((HRAWINPUT)lParam, RID_INPUT,
-				lpb, &dwSize, sizeof(RAWINPUTHEADER));
-
-			RAWINPUT* raw = (RAWINPUT*)lpb;
-
-			if (raw->header.dwType == RIM_TYPEMOUSE)
-			{
-				gWndDatas->mousePosX += raw->data.mouse.lLastX;
-				gWndDatas->mousePosY += raw->data.mouse.lLastY;
-			}
-			break;
-		}
-		default:
-			break;
-		}
-		return gWndDatas->pWndProc(hWnd, uMsg, wParam, lParam);
-	}
-}
-
 ConsoleWindow::ConsoleWindow()
 	:
 	datas(nullptr)
@@ -66,7 +28,7 @@ ConsoleWindow::ConsoleWindow()
 
 int ConsoleWindow::Create(const wchar_t* title, short _bufferWidth, short _bufferHeight, short _fontWidth, short _fontHeight)
 {
-	if (nullptr != datas || nullptr != gWndDatas)
+	if (nullptr != datas)
 	{
 		return -1;
 	}
@@ -133,7 +95,7 @@ int ConsoleWindow::Create(const wchar_t* title, short _bufferWidth, short _buffe
 
 	{
 		CHAR_INFO ci = {};
-		ci.Char.AsciiChar = char(219);
+		ci.Char.AsciiChar = ' ';
 		ci.Attributes = 0;
 
 		for (size_t i = 0; i < BUFFER_COUNT; i++)
@@ -151,19 +113,7 @@ int ConsoleWindow::Create(const wchar_t* title, short _bufferWidth, short _buffe
 		}
 	}
 
-	{
-		gWndDatas = datas;
-		datas->pWndProc = (WNDPROC)GetWindowLongPtr(datas->hWnd, GWLP_WNDPROC);
-		SetWindowLongPtr(datas->hWnd, GWLP_WNDPROC, (LONG_PTR)WndProc);
-
-		RAWINPUTDEVICE rawInputDevice = {};
-		rawInputDevice.usUsagePage = 1;
-		rawInputDevice.usUsage = 2;
-		rawInputDevice.hwndTarget = datas->hWnd;
-		rawInputDevice.dwFlags = RIDEV_INPUTSINK;// RIDEV_CAPTUREMOUSE;
-		CHECK(RegisterRawInputDevices(&rawInputDevice, 1, sizeof(RAWINPUTDEVICE)));
-		DWORD ret = GetLastError();
-	}
+	MouseInputReceiver::Start(&(datas->mousePosX));
 
 	return 0;
 }
@@ -175,6 +125,8 @@ int ConsoleWindow::Destroy()
 		return -1;
 	}
 
+	MouseInputReceiver::Stop();
+
 	CHECK(SetConsoleActiveScreenBuffer(datas->hStdout));
 	for (size_t i = 1; i < BUFFER_COUNT; ++i)
 	{
@@ -185,8 +137,6 @@ int ConsoleWindow::Destroy()
 	CHECK(FreeConsole());
 
 	delete datas;
-
-	gWndDatas = nullptr;
 
 	return 0;
 }
@@ -215,10 +165,12 @@ int ConsoleWindow::Update()
 
 	CHECK(GetKeyboardState(datas->keyStates));*/
 
+	MouseInputReceiver::Update();
+
 	return 0;
 }
 
-int ConsoleWindow::Clear(unsigned short color)
+int ConsoleWindow::Clear(unsigned short color, char ascii)
 {
 	if (nullptr == datas)
 	{
@@ -229,7 +181,9 @@ int ConsoleWindow::Clear(unsigned short color)
 	{
 		for (short x = 0; x < bufferWidth; ++x)
 		{
-			datas->buffer[y * bufferWidth + x].Attributes = color;
+			CHAR_INFO& info = datas->buffer[y * bufferWidth + x];
+			info.Char.AsciiChar = ascii;
+			info.Attributes = color;
 		}
 	}
 
@@ -271,9 +225,11 @@ int ConsoleWindow::Flush()
 	return 0;
 }
 
-void ConsoleWindow::SetColor(short x, short y, unsigned int color)
+void ConsoleWindow::SetColor(short x, short y, unsigned int color, char ascii)
 {
-	datas->buffer[y * bufferWidth + x].Attributes = color;
+	CHAR_INFO& info = datas->buffer[y * bufferWidth + x];
+	info.Char.AsciiChar = ascii;
+	info.Attributes = color;
 }
 
 bool ConsoleWindow::IsKeyDown(unsigned char vkCode) const

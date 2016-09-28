@@ -15,12 +15,12 @@ public:
 
 	int		Update();
 
-	int		Clear(unsigned short color);
+	int		Clear(unsigned short color, char ascii = '\xdb');
 
 	int		SwapBuffers();
 	int		Flush();
 
-	void	SetColor(short x, short y, unsigned int color);
+	void	SetColor(short x, short y, unsigned int color, char ascii = '\xdb');
 
 	bool	IsKeyDown(unsigned char vkCode) const;
 
