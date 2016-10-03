@@ -159,35 +159,20 @@ int Pipeline::Draw(const float* vertices, size_t numVertices, const int* indices
 		}
 
 		// clipping
-		Clip(reinterpret_cast<float*>(positionsBuffer), 12, clippedPositions, clippedCount);
+		Clip(pixelDataBlock, 3, clippedDataBlock, clippedCount, pixelDataStride);
 
-		if (clippedCount < 12) // less than 3 vertcies
+		if (clippedCount < 3) // less than 3 vertcies
 		{
 			continue;
 		}
 
-		// projection division
-
-		for (size_t i = 0; i < clippedCount; i += 4)
-		{
-			clippedPositions[i] /= clippedPositions[i + 3];
-			clippedPositions[i + 1] /= clippedPositions[i + 3];
-			clippedPositions[i + 2] /= clippedPositions[i + 3];
-			clippedPositions[i + 3] = 1.0f;
-		}
-
-		Interpolator interpolator(
-			positionsBuffer[0] / positionsBuffer[0].w,
-			positionsBuffer[1] / positionsBuffer[1].w,
-			positionsBuffer[2] / positionsBuffer[2].w);
-
 		// rasterization
-		for (size_t t = 4; t < clippedCount - 4; t += 4)
+		for (size_t t = 1; t < clippedCount - 1; ++t)
 		{
-			// 0, t, t + 4
-			interpolator.Interpolate(TOVEC4(&clippedPositions[0]), v1_out, v2_out, v3_out, v1_interp, pixelDataStride);
-			interpolator.Interpolate(TOVEC4(&clippedPositions[t]), v1_out, v2_out, v3_out, v2_interp, pixelDataStride);
-			interpolator.Interpolate(TOVEC4(&clippedPositions[t + 4]), v1_out, v2_out, v3_out, v3_interp, pixelDataStride);
+			// 0, t, t + 1
+			const float* v1_interp = clippedDataBlock;
+			const float* v2_interp = clippedDataBlock + t * pixelDataStride;
+			const float* v3_interp = clippedDataBlock + (t + 1) * pixelDataStride;
 
 			// viewport transform
 			screenPositions[0] = (viewportXScale * (v1_interp[0] / v1_interp[3]) + viewportXOffset);
@@ -197,7 +182,7 @@ int Pipeline::Draw(const float* vertices, size_t numVertices, const int* indices
 			screenPositions[4] = (viewportXScale * (v3_interp[0] / v3_interp[3]) + viewportXOffset);
 			screenPositions[5] = (-viewportYScale * (v3_interp[1] / v3_interp[3]) + viewportYOffset);
 
-			PixelEmitter emitter(this, screenPositions);
+			PixelEmitter emitter(this, screenPositions, v1_interp, v2_interp, v3_interp);
 
 			rasterizer->RasterizeTriangle(screenPositions, &emitter);
 		}
@@ -279,37 +264,35 @@ void Pipeline::Clip(const float* inputList, size_t inputCount, float* outputList
 		const float* in = IN_BUFFER;\
 		float* out = OUT_BUFFER;\
 		outputCount = 0;\
-		size_t last_index = inputCount - 4;\
-		for (size_t i = 0; i < inputCount; i += 4)\
+		size_t last_index = inputCount - 1;\
+		for (size_t i = 0; i < inputCount; ++i)\
 		{\
 			size_t cur = i * stride;\
 			size_t prv = last_index * stride;\
 			if (in[cur OFFSET] CMP SIGN in[cur + 3])\
 			{\
-				if (!(in[last_index OFFSET] CMP SIGN in[last_index + 3]))\
+				if (!(in[prv OFFSET] CMP SIGN in[prv + 3]))\
 				{\
-					float t = (in[last_index + 3] - (SIGN in[last_index OFFSET])) / \
-						(SIGN (in[cur OFFSET] - in[last_index OFFSET]) - in[cur + 3] + in[last_index + 3]);\
-					out[outputCount    ] = in[last_index    ] + t * (in[cur    ] - in[last_index    ]);\
-					out[outputCount + 1] = in[last_index + 1] + t * (in[cur + 1] - in[last_index + 1]);\
-					out[outputCount + 2] = in[last_index + 2] + t * (in[cur + 2] - in[last_index + 2]);\
-					out[outputCount + 3] = in[last_index + 3] + t * (in[cur + 3] - in[last_index + 3]);\
-					outputCount += 4;\
+					float t = (in[prv + 3] - (SIGN in[prv OFFSET])) / \
+						(SIGN (in[cur OFFSET] - in[prv OFFSET]) - in[cur + 3] + in[prv + 3]);\
+					size_t outp = (outputCount++) * stride;\
+					for (size_t p = 0; p < stride; ++p) {\
+						out[outp + p] = in[prv + p] + t * (in[cur + p] - in[prv + p]);\
+					}\
 				}\
-				out[outputCount++] = in[cur];\
-				out[outputCount++] = in[cur + 1];\
-				out[outputCount++] = in[cur + 2];\
-				out[outputCount++] = in[cur + 3];\
+				size_t outp = (outputCount++) * stride;\
+				for (size_t p = 0; p < stride; ++p) {\
+					out[outp++] = in[cur + p];\
+				}\
 			}\
-			else if (in[last_index OFFSET] CMP SIGN in[last_index + 3])\
+			else if (in[prv OFFSET] CMP SIGN in[prv + 3])\
 			{\
-				float t = (in[last_index + 3] - (SIGN in[last_index OFFSET])) / \
-					(SIGN (in[cur OFFSET] - in[last_index OFFSET]) - in[cur + 3] + in[last_index + 3]);\
-				out[outputCount    ] = in[last_index    ] + t * (in[cur    ] - in[last_index    ]);\
-				out[outputCount + 1] = in[last_index + 1] + t * (in[cur + 1] - in[last_index + 1]);\
-				out[outputCount + 2] = in[last_index + 2] + t * (in[cur + 2] - in[last_index + 2]);\
-				out[outputCount + 3] = in[last_index + 3] + t * (in[cur + 3] - in[last_index + 3]);\
-				outputCount += 4;\
+				float t = (in[prv + 3] - (SIGN in[prv OFFSET])) / \
+					(SIGN (in[cur OFFSET] - in[prv OFFSET]) - in[cur + 3] + in[prv + 3]);\
+				size_t outp = (outputCount++) * stride;\
+				for (size_t p = 0; p < stride; ++p) {\
+					out[outp + p] = in[prv + p] + t * (in[cur + p] - in[prv + p]);\
+				}\
 			}\
 			last_index = i;\
 		}\

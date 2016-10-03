@@ -156,7 +156,7 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR pCmdLin
 		lastTime = now;
 		elapsed = deltaTime + elapsed - interval;
 
-		//t += 0.016f;
+		t += deltaTime;
 		float angle = 3.1415f * 0.2f * t;
 
 		sprintf_s(title, "%.4f (%7d, %7d) angle = %10d", deltaTime, window.GetMousePositionX(), window.GetMousePositionY(), int(angle / 3.1415926 * 180) % 360);
@@ -171,25 +171,10 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR pCmdLin
 		glm::mat4 matMVP = matProj * matRotate * matTranslate;
 		pipeline.SetConstantBuffer(reinterpret_cast<float*>(&matMVP));
 
-		pipeline.Draw(vertices, num_vertices, indices + 6, num_indices / 4);
+		pipeline.Draw(vertices, num_vertices, indices, num_indices);
 
 		window.Flush();
 		window.SwapBuffers();
-
-		while (1)
-		{
-			if (window.IsKeyDown('A')) {
-				t += 0.002f;
-				break;
-			}
-			else if (window.IsKeyDown('D')) {
-				t -= 0.002f;
-				break;
-			}
-			else if (window.IsKeyDown(' ')) {
-				break;
-			}
-		}
 	}
 
 	window.Destroy();

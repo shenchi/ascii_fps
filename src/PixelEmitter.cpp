@@ -9,10 +9,14 @@
 #define x3 screenPosisions[4]
 #define y3 screenPosisions[5]
 
-PixelEmitter::PixelEmitter(Pipeline* pipeline, const float* screenPosisions)
+PixelEmitter::PixelEmitter(Pipeline* pipeline, const float* screenPosisions, const float* v1_data, const float* v2_data, const float* v3_data)
 	:
 	pipeline(pipeline),
 	screenPosisions(screenPosisions),
+	p1(v1_data),
+	p2(v2_data),
+	p3(v3_data),
+	data(pipeline->interpolateDataBlock),
 	stride(pipeline->pixelShader->Stride())
 {
 	y2_3 = y2 - y3;
@@ -25,11 +29,6 @@ PixelEmitter::PixelEmitter(Pipeline* pipeline, const float* screenPosisions)
 
 void PixelEmitter::EmitPixel(int x, int y)
 {
-	//float* p1 = pipeline->interpolateDataBlock;
-	float* p2 = p1 + stride;
-	float* p3 = p2 + stride;
-	float* data = p3 + stride;
-
 	float a = (y2_3 * (x - x3) + x3_2 * (y - y3)) / det;
 	float b = (y3_1 * (x - x3) + x1_3 * (y - y3)) / det;
 	float c = 1.0f - a - b;
