@@ -67,9 +67,6 @@
     <ClInclude Include="..\src\ObjMeshDumpper.h">
       <Filter>Engine\Utils\Debugger</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Interpolator.h">
-      <Filter>Engine\Renderer</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">

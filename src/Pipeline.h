@@ -35,7 +35,7 @@ private:
 	friend class PixelEmitter;
 
 	bool ZTest(int x, int y, float z);
-	void Clip(const float* inputList, size_t inputCount, float* outputList, size_t& outputCount) const;
+	void Clip(const float* inputList, size_t inputCount, float* outputList, size_t& outputCount, size_t stride) const;
 
 private:
 	Rasterizer*				rasterizer;
@@ -48,6 +48,7 @@ private:
 	size_t					vertexDataStride;
 	size_t					pixelDataStride;
 	float*					pixelDataBlock;
+	float*					clippedDataBlock;
 	float*					interpolateDataBlock;
 	float					viewportXScale;
 	float					viewportXOffset;

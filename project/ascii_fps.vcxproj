@@ -161,7 +161,6 @@
   <ItemGroup>
     <ClInclude Include="..\src\AsciiGrayScale.h" />
     <ClInclude Include="..\src\ConsoleWindow.h" />
-    <ClInclude Include="..\src\Interpolator.h" />
     <ClInclude Include="..\src\MapGenerator.h" />
     <ClInclude Include="..\src\MapMesh.h" />
     <ClInclude Include="..\src\MouseInputReceiver.h" />

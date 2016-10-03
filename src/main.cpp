@@ -186,6 +186,9 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR pCmdLin
 				t -= 0.002f;
 				break;
 			}
+			else if (window.IsKeyDown(' ')) {
+				break;
+			}
 		}
 	}
 

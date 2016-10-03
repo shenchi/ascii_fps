@@ -2,7 +2,6 @@
 #include "Shader.h"
 #include "Rasterizer.h"
 #include "PixelEmitter.h"
-#include "Interpolator.h"
 
 #ifdef _DEBUG
 #include <cassert>
@@ -20,6 +19,7 @@ Pipeline::Pipeline(Rasterizer* rasterizer, IColorBufferAdaptor* adaptor)
 	vertexDataStride(0),
 	pixelDataStride(0),
 	pixelDataBlock(nullptr),
+	clippedDataBlock(nullptr),
 	interpolateDataBlock(nullptr)
 {
 	SetVertexShader(nullptr);
@@ -33,6 +33,11 @@ Pipeline::~Pipeline()
 	if (nullptr != pixelDataBlock)
 	{
 		delete[] pixelDataBlock;
+	}
+
+	if (nullptr != clippedDataBlock)
+	{
+		delete[] clippedDataBlock;
 	}
 
 	if (nullptr != interpolateDataBlock)
@@ -93,11 +98,18 @@ void Pipeline::SetPixelShader(Shader * shader)
 	}
 	pixelDataBlock = new float[pixelDataStride * 3];
 
+	if (nullptr != clippedDataBlock)
+	{
+		delete[] clippedDataBlock;
+	}
+	clippedDataBlock = new float[pixelDataStride * 80];
+
 	if (nullptr != interpolateDataBlock)
 	{
 		delete[] interpolateDataBlock;
 	}
-	interpolateDataBlock = new float[pixelDataStride * 4];
+
+	interpolateDataBlock = new float[pixelDataStride];
 }
 
 void Pipeline::SetConstantBuffer(const float * buffer)
@@ -115,8 +127,6 @@ static inline bool IsCW(float* v1, float* v2, float* v3)
 	return (dx2_1 * dy3_1 - dy2_1 * dx3_1 > 0);
 }
 
-#define TOVEC4(x) *reinterpret_cast<glm::vec4*>(x)
-
 int Pipeline::Draw(const float* vertices, size_t numVertices, const int* indices, size_t numIndices)
 {
 	if (numIndices % 3 != 0)
@@ -128,12 +138,6 @@ int Pipeline::Draw(const float* vertices, size_t numVertices, const int* indices
 	float* v2_out = v1_out + pixelDataStride;
 	float* v3_out = v2_out + pixelDataStride;
 
-	float* v1_interp = interpolateDataBlock;
-	float* v2_interp = v1_interp + pixelDataStride;
-	float* v3_interp = v2_interp + pixelDataStride;
-
-	glm::vec4 positionsBuffer[3] = {};
-	float clippedPositions[40] = {};
 	size_t clippedCount = 0;
 
 	float screenPositions[6] = {};
@@ -154,10 +158,6 @@ int Pipeline::Draw(const float* vertices, size_t numVertices, const int* indices
 			continue;
 		}
 
-		positionsBuffer[0] = TOVEC4(v1_out);
-		positionsBuffer[1] = TOVEC4(v2_out);
-		positionsBuffer[2] = TOVEC4(v3_out);
-
 		// clipping
 		Clip(reinterpret_cast<float*>(positionsBuffer), 12, clippedPositions, clippedCount);
 
@@ -166,8 +166,20 @@ int Pipeline::Draw(const float* vertices, size_t numVertices, const int* indices
 			continue;
 		}
 
-		// projection division  // TODO
-		Interpolator interpolator(positionsBuffer[0], positionsBuffer[0], positionsBuffer[0]);
+		// projection division
+
+		for (size_t i = 0; i < clippedCount; i += 4)
+		{
+			clippedPositions[i] /= clippedPositions[i + 3];
+			clippedPositions[i + 1] /= clippedPositions[i + 3];
+			clippedPositions[i + 2] /= clippedPositions[i + 3];
+			clippedPositions[i + 3] = 1.0f;
+		}
+
+		Interpolator interpolator(
+			positionsBuffer[0] / positionsBuffer[0].w,
+			positionsBuffer[1] / positionsBuffer[1].w,
+			positionsBuffer[2] / positionsBuffer[2].w);
 
 		// rasterization
 		for (size_t t = 4; t < clippedCount - 4; t += 4)
@@ -210,9 +222,9 @@ bool Pipeline::ZTest(int x, int y, float z)
 * https://en.wikipedia.org/wiki/Sutherland%E2%80%93Hodgman_algorithm
 * http://fabiensanglard.net/polygon_codec/
 */
-void Pipeline::Clip(const float* inputList, size_t inputCount, float* outputList, size_t& outputCount) const
+void Pipeline::Clip(const float* inputList, size_t inputCount, float* outputList, size_t& outputCount, size_t stride) const
 {
-	float temp_buffer[40];
+	float* const temp_buffer = outputList + 40 * stride;
 
 	constexpr float W_CLIPPING_PLANE = 0.00001f;
 
@@ -221,33 +233,41 @@ void Pipeline::Clip(const float* inputList, size_t inputCount, float* outputList
 		const float* in = IN_BUFFER;\
 		float* out = OUT_BUFFER;\
 		outputCount = 0;\
-		size_t last_index = inputCount - 4;\
-		for (size_t i = 0; i < inputCount; i += 4)\
+		size_t last_index = inputCount - 1;\
+		for (size_t i = 0; i < inputCount; ++i)\
 		{\
-			if (in[i + 3] > W_CLIPPING_PLANE)\
+			size_t cur = i * stride;\
+			size_t prv = last_index * stride;\
+			if (in[cur + 3] > W_CLIPPING_PLANE)\
 			{\
-				if (!(in[last_index + 3] > W_CLIPPING_PLANE))\
+				if (!(in[prv + 3] > W_CLIPPING_PLANE))\
 				{\
-					float t = (W_CLIPPING_PLANE - in[last_index + 3]) / (in[i + 3] - in[last_index + 3]);\
-					out[outputCount + 3] = W_CLIPPING_PLANE;\
-					out[outputCount] = in[last_index] + t * (in[i] - in[last_index]);\
-					out[outputCount + 1] = in[last_index + 1] + t * (in[i + 1] - in[last_index + 1]);\
-					out[outputCount + 2] = in[last_index + 2] + t * (in[i + 2] - in[last_index + 2]);\
-					outputCount += 4;\
+					float t = (W_CLIPPING_PLANE - in[prv + 3]) / (in[cur + 3] - in[prv + 3]);\
+					size_t outp = (outputCount++) * stride;\
+					out[outp + 3] = W_CLIPPING_PLANE;\
+					out[outp] = in[prv] + t * (in[cur] - in[prv]);\
+					out[outp + 1] = in[prv + 1] + t * (in[cur + 1] - in[prv + 1]);\
+					out[outp + 2] = in[prv + 2] + t * (in[cur + 2] - in[prv + 2]);\
+					for (size_t p = 4; p < stride; ++p) {\
+						out[outp + p] = in[prv + p] + t * (in[cur + p] - in[prv + p]);\
+					}\
 				}\
-				out[outputCount++] = in[i];\
-				out[outputCount++] = in[i + 1];\
-				out[outputCount++] = in[i + 2];\
-				out[outputCount++] = in[i + 3];\
+				size_t outp = (outputCount++) * stride;\
+				for (size_t p = 0; p < stride; ++p) {\
+					out[outp++] = in[cur + p];\
+				}\
 			}\
-			else if (in[last_index + 3] > W_CLIPPING_PLANE)\
+			else if (in[prv + 3] > W_CLIPPING_PLANE)\
 			{\
-				float t = (W_CLIPPING_PLANE - in[last_index + 3]) / (in[i + 3] - in[last_index + 3]);\
-				out[outputCount + 3] = W_CLIPPING_PLANE;\
-				out[outputCount] = in[last_index] + t * (in[i] - in[last_index]);\
-				out[outputCount + 1] = in[last_index + 1] + t * (in[i + 1] - in[last_index + 1]);\
-				out[outputCount + 2] = in[last_index + 2] + t * (in[i + 2] - in[last_index + 2]);\
-				outputCount += 4;\
+				float t = (W_CLIPPING_PLANE - in[prv + 3]) / (in[cur + 3] - in[prv + 3]);\
+				size_t outp = (outputCount++) * stride;\
+				out[outp + 3] = W_CLIPPING_PLANE;\
+				out[outp] = in[prv] + t * (in[cur] - in[prv]);\
+				out[outp + 1] = in[prv + 1] + t * (in[cur + 1] - in[prv + 1]);\
+				out[outp + 2] = in[prv + 2] + t * (in[cur + 2] - in[prv + 2]);\
+				for (size_t p = 4; p < stride; ++p) {\
+					out[outp + p] = in[prv + p] + t * (in[cur + p] - in[prv + p]);\
+				}\
 			}\
 			last_index = i;\
 		}\
@@ -262,31 +282,33 @@ void Pipeline::Clip(const float* inputList, size_t inputCount, float* outputList
 		size_t last_index = inputCount - 4;\
 		for (size_t i = 0; i < inputCount; i += 4)\
 		{\
-			if (in[i OFFSET] CMP SIGN in[i + 3])\
+			size_t cur = i * stride;\
+			size_t prv = last_index * stride;\
+			if (in[cur OFFSET] CMP SIGN in[cur + 3])\
 			{\
 				if (!(in[last_index OFFSET] CMP SIGN in[last_index + 3]))\
 				{\
 					float t = (in[last_index + 3] - (SIGN in[last_index OFFSET])) / \
-						(SIGN (in[i OFFSET] - in[last_index OFFSET]) - in[i + 3] + in[last_index + 3]);\
-					out[outputCount    ] = in[last_index    ] + t * (in[i    ] - in[last_index    ]);\
-					out[outputCount + 1] = in[last_index + 1] + t * (in[i + 1] - in[last_index + 1]);\
-					out[outputCount + 2] = in[last_index + 2] + t * (in[i + 2] - in[last_index + 2]);\
-					out[outputCount + 3] = in[last_index + 3] + t * (in[i + 3] - in[last_index + 3]);\
+						(SIGN (in[cur OFFSET] - in[last_index OFFSET]) - in[cur + 3] + in[last_index + 3]);\
+					out[outputCount    ] = in[last_index    ] + t * (in[cur    ] - in[last_index    ]);\
+					out[outputCount + 1] = in[last_index + 1] + t * (in[cur + 1] - in[last_index + 1]);\
+					out[outputCount + 2] = in[last_index + 2] + t * (in[cur + 2] - in[last_index + 2]);\
+					out[outputCount + 3] = in[last_index + 3] + t * (in[cur + 3] - in[last_index + 3]);\
 					outputCount += 4;\
 				}\
-				out[outputCount++] = in[i];\
-				out[outputCount++] = in[i + 1];\
-				out[outputCount++] = in[i + 2];\
-				out[outputCount++] = in[i + 3];\
+				out[outputCount++] = in[cur];\
+				out[outputCount++] = in[cur + 1];\
+				out[outputCount++] = in[cur + 2];\
+				out[outputCount++] = in[cur + 3];\
 			}\
 			else if (in[last_index OFFSET] CMP SIGN in[last_index + 3])\
 			{\
 				float t = (in[last_index + 3] - (SIGN in[last_index OFFSET])) / \
-					(SIGN (in[i OFFSET] - in[last_index OFFSET]) - in[i + 3] + in[last_index + 3]);\
-				out[outputCount    ] = in[last_index    ] + t * (in[i    ] - in[last_index    ]);\
-				out[outputCount + 1] = in[last_index + 1] + t * (in[i + 1] - in[last_index + 1]);\
-				out[outputCount + 2] = in[last_index + 2] + t * (in[i + 2] - in[last_index + 2]);\
-				out[outputCount + 3] = in[last_index + 3] + t * (in[i + 3] - in[last_index + 3]);\
+					(SIGN (in[cur OFFSET] - in[last_index OFFSET]) - in[cur + 3] + in[last_index + 3]);\
+				out[outputCount    ] = in[last_index    ] + t * (in[cur    ] - in[last_index    ]);\
+				out[outputCount + 1] = in[last_index + 1] + t * (in[cur + 1] - in[last_index + 1]);\
+				out[outputCount + 2] = in[last_index + 2] + t * (in[cur + 2] - in[last_index + 2]);\
+				out[outputCount + 3] = in[last_index + 3] + t * (in[cur + 3] - in[last_index + 3]);\
 				outputCount += 4;\
 			}\
 			last_index = i;\
