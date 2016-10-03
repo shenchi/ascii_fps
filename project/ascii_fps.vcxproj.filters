@@ -23,6 +23,15 @@
     <ClCompile Include="..\src\AsciiGrayScale.cpp">
       <Filter>Engine\Utils</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\MapGenerator.cpp">
+      <Filter>Engine\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\MapMesh.cpp">
+      <Filter>Engine\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ObjMeshDumpper.cpp">
+      <Filter>Engine\Utils\Debugger</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\Shader.h">
@@ -49,6 +58,18 @@
     <ClInclude Include="..\src\AsciiGrayScale.h">
       <Filter>Engine\Utils</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\MapGenerator.h">
+      <Filter>Engine\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\MapMesh.h">
+      <Filter>Engine\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\ObjMeshDumpper.h">
+      <Filter>Engine\Utils\Debugger</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Interpolator.h">
+      <Filter>Engine\Renderer</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -62,6 +83,9 @@
     </Filter>
     <Filter Include="Engine\Utils">
       <UniqueIdentifier>{7cb2a0d8-dfe3-443e-8d49-6b28a260851a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Utils\Debugger">
+      <UniqueIdentifier>{d87a8589-324c-46ed-82ff-b00cb3fe47c0}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

@@ -15,4 +15,8 @@ public:
 	static Shader*	DefaultVertexShader();
 
 	static Shader*	DefaultPixelShader();
+
+	static Shader*	GetVertexShader(size_t idx);
+
+	static Shader*	GetPixelShader(size_t idx);
 };

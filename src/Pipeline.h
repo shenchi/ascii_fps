@@ -29,12 +29,13 @@ public:
 
 	void SetConstantBuffer(const float* buffer);
 
-	int Draw(const float* vertices, size_t numVertices, const size_t* indices, size_t numIndices);
+	int Draw(const float* vertices, size_t numVertices, const int* indices, size_t numIndices);
 
 private:
 	friend class PixelEmitter;
 
 	bool ZTest(int x, int y, float z);
+	void Clip(const float* inputList, size_t inputCount, float* outputList, size_t& outputCount) const;
 
 private:
 	Rasterizer*				rasterizer;
@@ -47,6 +48,7 @@ private:
 	size_t					vertexDataStride;
 	size_t					pixelDataStride;
 	float*					pixelDataBlock;
+	float*					interpolateDataBlock;
 	float					viewportXScale;
 	float					viewportXOffset;
 	float					viewportYScale;

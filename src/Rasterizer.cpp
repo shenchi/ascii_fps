@@ -19,15 +19,21 @@ Rasterizer::~Rasterizer()
 Rasterizing with "half-space" method:
 http://forum.devmaster.net/t/advanced-rasterization/6145
 */
-void Rasterizer::RasterizeTriangle(const float positions[6], PixelEmitter* emitter)
+void Rasterizer::RasterizeTriangle(const float* positions, PixelEmitter* emitter)
 {
-	int x1 = (int)(positions[0]);
-	int y1 = (int)(positions[1]);
-	int x2 = (int)(positions[2]);
-	int y2 = (int)(positions[3]);
-	int x3 = (int)(positions[4]);
-	int y3 = (int)(positions[5]);
+	RasterizeTriangle(
+		(int)(positions[0]),
+		(int)(positions[1]),
+		(int)(positions[2]),
+		(int)(positions[3]),
+		(int)(positions[4]),
+		(int)(positions[5]),
+		emitter
+	);
+}
 
+void Rasterizer::RasterizeTriangle(int x1, int y1, int x2, int y2, int x3, int y3, PixelEmitter * emitter)
+{
 	int dx1_2 = x1 - x2;
 	int dx2_3 = x2 - x3;
 	int dx3_1 = x3 - x1;

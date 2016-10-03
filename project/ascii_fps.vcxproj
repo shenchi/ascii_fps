@@ -149,7 +149,10 @@
     <ClCompile Include="..\src\AsciiGrayScale.cpp" />
     <ClCompile Include="..\src\ConsoleWindow.cpp" />
     <ClCompile Include="..\src\main.cpp" />
+    <ClCompile Include="..\src\MapGenerator.cpp" />
+    <ClCompile Include="..\src\MapMesh.cpp" />
     <ClCompile Include="..\src\MouseInputReceiver.cpp" />
+    <ClCompile Include="..\src\ObjMeshDumpper.cpp" />
     <ClCompile Include="..\src\Pipeline.cpp" />
     <ClCompile Include="..\src\PixelEmitter.cpp" />
     <ClCompile Include="..\src\Rasterizer.cpp" />
@@ -158,7 +161,11 @@
   <ItemGroup>
     <ClInclude Include="..\src\AsciiGrayScale.h" />
     <ClInclude Include="..\src\ConsoleWindow.h" />
+    <ClInclude Include="..\src\Interpolator.h" />
+    <ClInclude Include="..\src\MapGenerator.h" />
+    <ClInclude Include="..\src\MapMesh.h" />
     <ClInclude Include="..\src\MouseInputReceiver.h" />
+    <ClInclude Include="..\src\ObjMeshDumpper.h" />
     <ClInclude Include="..\src\Pipeline.h" />
     <ClInclude Include="..\src\PixelEmitter.h" />
     <ClInclude Include="..\src\Rasterizer.h" />

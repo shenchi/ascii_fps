@@ -5,7 +5,10 @@
 #include "ConsoleWindow.h"
 #include "Rasterizer.h"
 #include "Pipeline.h"
+#include "Shader.h"
 #include "AsciiGrayScale.h"
+#include "MapMesh.h"
+#include "ObjMeshDumpper.h"
 
 typedef std::chrono::high_resolution_clock timer;
 
@@ -61,45 +64,75 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR pCmdLin
 	Pipeline pipeline(&raster, adaptor);
 
 #pragma region data
-	float vertices[] =
-	{
-		-0.5f, -0.5f, -0.5f, 1.0f,
-		-0.5f,  0.5f, -0.5f, 1.0f,
-		 0.5f, -0.5f, -0.5f, 1.0f,
-		 0.5f,  0.5f, -0.5f, 1.0f,
-		 -0.5f, -0.5f, 0.5f, 1.0f,
-		 -0.5f,  0.5f, 0.5f, 1.0f,
-		 0.5f, -0.5f, 0.5f, 1.0f,
-		 0.5f,  0.5f, 0.5f, 1.0f,
+	const char gridMap[] = {
+		0, 0, 0, 0, 0, 0, 0, 0,
+		0, 1, 1, 1, 1, 1, 1, 0,
+		0, 1, 1, 1, 1, 1, 1, 0,
+		0, 1, 1, 1, 1, 1, 1, 0,
+		0, 1, 1, 1, 1, 1, 1, 0,
+		0, 1, 1, 1, 1, 1, 1, 0,
+		0, 1, 1, 1, 1, 1, 1, 0,
+		0, 0, 0, 0, 0, 0, 0, 0,
 	};
-	size_t num_vertices = sizeof(vertices) / sizeof(float) / 4;
 
-	size_t indices[] =
+	const char tileTypes[] = { 1, 0 };
+
+	float red_color[] = { 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f };
+
+	MapMesh mesh;
+	mesh.CreateFromGridMap(gridMap, 8, 8, tileTypes, 2, 1);
+	mesh.GenerateMesh(1.0f, 2.0f, red_color);
+
+	auto vert = mesh.GetVertices();
+	auto idx = mesh.GetIndices();
+
+	const float* vertices = reinterpret_cast<const float*>(&(vert[0]));
+	size_t num_vertices = vert.size();
+
+	const int* indices = &(idx[0]);
+	size_t num_indices = idx.size();
+
 	{
-		0, 1, 2,
-		2, 1, 3,
+		float* p = const_cast<float*>(vertices);
 
-		2, 3, 6,
-		6, 3, 7,
+		float colors[] = {
+			1.0f, 0.0f, 0.0f,
+			0.0f, 1.0f, 0.0f,
+			0.0f, 0.0f, 1.0f,
+			1.0f, 1.0f, 1.0f
+		};
 
-		6, 7, 4,
-		4, 7, 5,
+		for (size_t f = 0; f < 4; ++f)
+		{
+			float* pf = p + f * 4 * 9;
+			float* color = &(colors[f * 3]);
 
-		4, 5, 0,
-		0, 5, 1,
+			for (size_t v = 0; v < 4; ++v)
+			{
+				float* pv = pf + v * 9;
 
-		1, 5, 3,
-		3, 5, 7,
+				pv[6] = color[0];
+				pv[7] = color[1];
+				pv[8] = color[2];
+			}
+		}
+	}
 
-		4, 0, 6,
-		6, 0, 2
-	};
-	size_t num_indices = sizeof(indices) / sizeof(size_t);
+	{
+		Debugger::ObjMeshDumpper obj("original.obj");
+		
+		for (size_t i = 0; i < idx.size(); i += 3)
+		{
+			obj.AddTriangle(
+				&(vert[idx[i]].x),
+				&(vert[idx[i + 1]].x),
+				&(vert[idx[i + 2]].x));
+		}
+	}
 
 	glm::mat4 matRotate(1.0f);
-	glm::mat4 matTranslate = glm::translate(glm::vec3(0.0f, 0.0f, 5.0f));
-	glm::mat4 matTranslate2 = glm::translate(glm::vec3(1.0f, 0.0f, 6.0f));
-	glm::mat4 matProj = glm::perspective(3.14159265f / 6, 0.5f * bufferWidth / bufferHeight, 0.001f, 10.0f);
+	glm::mat4 matTranslate = glm::translate(glm::vec3(-4.0f, -1.0f, -4.0f));
+	glm::mat4 matProj = glm::perspective(3.14159265f / 2, 0.5f * bufferWidth / bufferHeight, 1.0f, 20.0f);
 
 	float t = 0.0f;
 	float backgroundColor[] = { 0.0f, 0.0f, 0.0f, 1.0f };
@@ -123,27 +156,37 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR pCmdLin
 		lastTime = now;
 		elapsed = deltaTime + elapsed - interval;
 
-		sprintf_s(title, "%.4f (%7d, %7d)", deltaTime, window.GetMousePositionX(), window.GetMousePositionY());
+		//t += 0.016f;
+		float angle = 3.1415f * 0.2f * t;
+
+		sprintf_s(title, "%.4f (%7d, %7d) angle = %10d", deltaTime, window.GetMousePositionX(), window.GetMousePositionY(), int(angle / 3.1415926 * 180) % 360);
 		window.SetTitleA(title);
 
 		window.Update();
 
 		pipeline.Clear(backgroundColor, 1.0f);
+		pipeline.SetVertexShader(BuiltInShaders::GetVertexShader(1));
 
-		t += deltaTime;
-		matRotate = glm::rotate(3.1415f * 0.5f * t, glm::vec3(1.0f, 1.0f, 1.0f));
-		glm::mat4 matMVP = matProj * matTranslate * matRotate;
+		matRotate = glm::rotate(angle, glm::vec3(0.0f, 1.0f, 0.0f));
+		glm::mat4 matMVP = matProj * matRotate * matTranslate;
 		pipeline.SetConstantBuffer(reinterpret_cast<float*>(&matMVP));
 
-		pipeline.Draw(vertices, num_vertices, indices, num_indices);
-
-		matMVP = matProj * matTranslate2 * matRotate;
-		pipeline.SetConstantBuffer(reinterpret_cast<float*>(&matMVP));
-
-		pipeline.Draw(vertices, num_vertices, indices, num_indices);
+		pipeline.Draw(vertices, num_vertices, indices + 6, num_indices / 4);
 
 		window.Flush();
 		window.SwapBuffers();
+
+		while (1)
+		{
+			if (window.IsKeyDown('A')) {
+				t += 0.002f;
+				break;
+			}
+			else if (window.IsKeyDown('D')) {
+				t -= 0.002f;
+				break;
+			}
+		}
 	}
 
 	window.Destroy();

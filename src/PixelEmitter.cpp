@@ -25,7 +25,7 @@ PixelEmitter::PixelEmitter(Pipeline* pipeline, const float* screenPosisions)
 
 void PixelEmitter::EmitPixel(int x, int y)
 {
-	float* p1 = pipeline->pixelDataBlock;
+	float* p1 = pipeline->interpolateDataBlock;
 	float* p2 = p1 + stride;
 	float* p3 = p2 + stride;
 	float* data = p3 + stride;
