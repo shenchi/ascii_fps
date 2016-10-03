@@ -118,12 +118,14 @@ void Pipeline::SetConstantBuffer(const float * buffer)
 	pixelShader->SetConstantBuffer(buffer);
 }
 
-static inline bool IsCW(float* v1, float* v2, float* v3)
+static inline bool IsCW(const float* v1, const float* v2, const float* v3)
 {
-	float dx2_1 = v2[0] - v1[0];
-	float dy2_1 = v2[1] - v1[1];
-	float dx3_1 = v3[0] - v1[0];
-	float dy3_1 = v3[1] - v1[1];
+	float x1 = v1[0] / v1[3];
+	float y1 = v1[1] / v1[3];
+	float dx2_1 = v2[0] / v2[3] - x1;
+	float dy2_1 = v2[1] / v2[3] - y1;
+	float dx3_1 = v3[0] / v3[3] - x1;
+	float dy3_1 = v3[1] / v3[3] - y1;
 	return (dx2_1 * dy3_1 - dy2_1 * dx3_1 > 0);
 }
 
@@ -152,12 +154,6 @@ int Pipeline::Draw(const float* vertices, size_t numVertices, const int* indices
 		vertexShader->Main(v2_in, v2_out);
 		vertexShader->Main(v3_in, v3_out);
 
-		// cull back face (CCW - front face)
-		if (IsCW(v1_out, v2_out, v3_out))
-		{
-			continue;
-		}
-
 		// clipping
 		Clip(pixelDataBlock, 3, clippedDataBlock, clippedCount, pixelDataStride);
 
@@ -173,6 +169,12 @@ int Pipeline::Draw(const float* vertices, size_t numVertices, const int* indices
 			const float* v1_interp = clippedDataBlock;
 			const float* v2_interp = clippedDataBlock + t * pixelDataStride;
 			const float* v3_interp = clippedDataBlock + (t + 1) * pixelDataStride;
+
+			// cull back face (CCW - front face)
+			if (IsCW(v1_interp, v2_interp, v3_interp))
+			{
+				continue;
+			}
 
 			// viewport transform
 			screenPositions[0] = (viewportXScale * (v1_interp[0] / v1_interp[3]) + viewportXOffset);
@@ -223,9 +225,9 @@ void Pipeline::Clip(const float* inputList, size_t inputCount, float* outputList
 		{\
 			size_t cur = i * stride;\
 			size_t prv = last_index * stride;\
-			if (in[cur + 3] > W_CLIPPING_PLANE)\
+			if (in[cur + 3] >= W_CLIPPING_PLANE)\
 			{\
-				if (!(in[prv + 3] > W_CLIPPING_PLANE))\
+				if (!(in[prv + 3] >= W_CLIPPING_PLANE))\
 				{\
 					float t = (W_CLIPPING_PLANE - in[prv + 3]) / (in[cur + 3] - in[prv + 3]);\
 					size_t outp = (outputCount++) * stride;\
@@ -242,7 +244,7 @@ void Pipeline::Clip(const float* inputList, size_t inputCount, float* outputList
 					out[outp++] = in[cur + p];\
 				}\
 			}\
-			else if (in[prv + 3] > W_CLIPPING_PLANE)\
+			else if (in[prv + 3] >= W_CLIPPING_PLANE)\
 			{\
 				float t = (W_CLIPPING_PLANE - in[prv + 3]) / (in[cur + 3] - in[prv + 3]);\
 				size_t outp = (outputCount++) * stride;\
@@ -301,12 +303,12 @@ void Pipeline::Clip(const float* inputList, size_t inputCount, float* outputList
 
 	CLIP_W(inputList, outputList);						// w = 0.0001
 
-	CLIP(/*+0*/, < , /*+*/, outputList, temp_buffer);   // w = x;
-	CLIP(/*+0*/, > , -, temp_buffer, outputList);		// w = -x;
-	CLIP(+1, < , /*+*/, outputList, temp_buffer);		// w = y;
-	CLIP(+1, > , -, temp_buffer, outputList);			// w = -y;
-	CLIP(+2, < , /*+*/, outputList, temp_buffer);		// w = z;
-	CLIP(+2, > , -, temp_buffer, outputList);			// w = -z;
+	CLIP(/*+0*/, <= , /*+*/, outputList, temp_buffer);   // w = x;
+	CLIP(/*+0*/, >= , -, temp_buffer, outputList);		// w = -x;
+	CLIP(+1, <= , /*+*/, outputList, temp_buffer);		// w = y;
+	CLIP(+1, >= , -, temp_buffer, outputList);			// w = -y;
+	CLIP(+2, <= , /*+*/, outputList, temp_buffer);		// w = z;
+	CLIP(+2, >= , -, temp_buffer, outputList);			// w = -z;
 
 
 #ifdef _DEBUG
