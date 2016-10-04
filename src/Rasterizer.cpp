@@ -22,12 +22,12 @@ http://forum.devmaster.net/t/advanced-rasterization/6145
 void Rasterizer::RasterizeTriangle(const float* positions, PixelEmitter* emitter)
 {
 	RasterizeTriangle(
-		(int)(positions[0]),
-		(int)(positions[1]),
-		(int)(positions[2]),
-		(int)(positions[3]),
-		(int)(positions[4]),
-		(int)(positions[5]),
+		(int)(positions[0] + 0.5f),
+		(int)(positions[1] + 0.5f),
+		(int)(positions[2] + 0.5f),
+		(int)(positions[3] + 0.5f),
+		(int)(positions[4] + 0.5f),
+		(int)(positions[5] + 0.5f),
 		emitter
 	);
 }
