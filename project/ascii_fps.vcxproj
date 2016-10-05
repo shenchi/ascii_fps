@@ -147,10 +147,16 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\src\AsciiGrayScale.cpp" />
+    <ClCompile Include="..\src\Camera.cpp" />
     <ClCompile Include="..\src\ConsoleWindow.cpp" />
+    <ClCompile Include="..\src\ConsoleWindowAdaptor.cpp" />
+    <ClCompile Include="..\src\DungeonMap.cpp" />
+    <ClCompile Include="..\src\Engine.cpp" />
+    <ClCompile Include="..\src\Game.cpp" />
     <ClCompile Include="..\src\main.cpp" />
     <ClCompile Include="..\src\MapGenerator.cpp" />
     <ClCompile Include="..\src\MapMesh.cpp" />
+    <ClCompile Include="..\src\Mesh.cpp" />
     <ClCompile Include="..\src\MouseInputReceiver.cpp" />
     <ClCompile Include="..\src\ObjMeshDumpper.cpp" />
     <ClCompile Include="..\src\Pipeline.cpp" />
@@ -160,9 +166,17 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\AsciiGrayScale.h" />
+    <ClInclude Include="..\src\Camera.h" />
+    <ClInclude Include="..\src\ColorBufferAdaptor.h" />
     <ClInclude Include="..\src\ConsoleWindow.h" />
+    <ClInclude Include="..\src\ConsoleWindowAdaptor.h" />
+    <ClInclude Include="..\src\DungeonMap.h" />
+    <ClInclude Include="..\src\Engine.h" />
+    <ClInclude Include="..\src\Entity.h" />
+    <ClInclude Include="..\src\Game.h" />
     <ClInclude Include="..\src\MapGenerator.h" />
     <ClInclude Include="..\src\MapMesh.h" />
+    <ClInclude Include="..\src\Mesh.h" />
     <ClInclude Include="..\src\MouseInputReceiver.h" />
     <ClInclude Include="..\src\ObjMeshDumpper.h" />
     <ClInclude Include="..\src\Pipeline.h" />

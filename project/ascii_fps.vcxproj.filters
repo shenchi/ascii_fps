@@ -23,14 +23,32 @@
     <ClCompile Include="..\src\AsciiGrayScale.cpp">
       <Filter>Engine\Utils</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\MapGenerator.cpp">
-      <Filter>Engine\Utils</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\MapMesh.cpp">
-      <Filter>Engine\Utils</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\ObjMeshDumpper.cpp">
       <Filter>Engine\Utils\Debugger</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Mesh.cpp">
+      <Filter>Engine\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ConsoleWindowAdaptor.cpp">
+      <Filter>Engine\Win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\DungeonMap.cpp">
+      <Filter>Gameplay</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\MapGenerator.cpp">
+      <Filter>Gameplay</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\MapMesh.cpp">
+      <Filter>Gameplay</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Game.cpp">
+      <Filter>Gameplay</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Engine.cpp">
+      <Filter>Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Camera.cpp">
+      <Filter>Engine</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -58,14 +76,38 @@
     <ClInclude Include="..\src\AsciiGrayScale.h">
       <Filter>Engine\Utils</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\MapGenerator.h">
-      <Filter>Engine\Utils</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\MapMesh.h">
-      <Filter>Engine\Utils</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\ObjMeshDumpper.h">
       <Filter>Engine\Utils\Debugger</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Mesh.h">
+      <Filter>Engine\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\ConsoleWindowAdaptor.h">
+      <Filter>Engine\Win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\ColorBufferAdaptor.h">
+      <Filter>Engine\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\DungeonMap.h">
+      <Filter>Gameplay</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\MapGenerator.h">
+      <Filter>Gameplay</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\MapMesh.h">
+      <Filter>Gameplay</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Engine.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Game.h">
+      <Filter>Gameplay</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Camera.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Entity.h">
+      <Filter>Engine</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -83,6 +125,9 @@
     </Filter>
     <Filter Include="Engine\Utils\Debugger">
       <UniqueIdentifier>{d87a8589-324c-46ed-82ff-b00cb3fe47c0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Gameplay">
+      <UniqueIdentifier>{35f5b42c-6b3f-4730-b6a1-a60474c887ba}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

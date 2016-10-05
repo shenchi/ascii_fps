@@ -9,15 +9,6 @@
 
 using namespace std;
 
-MapMesh::MapMesh()
-{
-}
-
-
-MapMesh::~MapMesh()
-{
-}
-
 void MapMesh::CreateFromGridMap(const char* map, int width, int height, const char* tileTypes, int nTileTypes, int defaultDensity)
 {
 	walls.clear();

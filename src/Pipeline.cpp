@@ -1,7 +1,9 @@
 #include "Pipeline.h"
+#include "ColorBufferAdaptor.h"
 #include "Shader.h"
 #include "Rasterizer.h"
 #include "PixelEmitter.h"
+#include "Mesh.h"
 
 #ifdef _DEBUG
 #include <cassert>
@@ -192,6 +194,11 @@ int Pipeline::Draw(const float* vertices, size_t numVertices, const int* indices
 	}
 
 	return 0;
+}
+
+int Pipeline::Draw(const Mesh * mesh)
+{
+	return Draw(mesh->GetVerticesData(), mesh->GetVerticesNum(), mesh->GetIndicesData(), mesh->GetIndicesNum());
 }
 
 bool Pipeline::ZTest(int x, int y, float z)

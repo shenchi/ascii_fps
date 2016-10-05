@@ -56,10 +56,6 @@ enum TileType
 class MapGenerator
 {
 public:
-	MapGenerator();
-	MapGenerator(int seed);
-	~MapGenerator();
-
 	void SetSeed(unsigned int seed);
 
 	void Start(int cellCount, int randomRadius, int minSideLength, int maxSideLength);
@@ -67,6 +63,8 @@ public:
 	void Update();
 
 	bool IsFinished() const { return state == Finished; }
+
+	void GenEntryAndExit();
 
 	void Gen2DArrayMap(char* map, size_t& width, size_t& height, const char tileTable[NumTileType]) const;
 
@@ -78,6 +76,11 @@ public:
 	int Top() const { return top; }
 	int Right() const { return right; }
 	int Bottom() const { return bottom; }
+
+	int EntryX() const { return entryX; }
+	int EntryY() const { return entryY; }
+	int ExitX() const { return exitX; }
+	int ExitY() const { return exitY; }
 
 private:
 	void UpdateRect();
@@ -105,6 +108,11 @@ private:
 	int							bottom;
 
 	State						state;
+
+	int							entryX;
+	int							entryY;
+	int							exitX;
+	int							exitY;
 
 	std::vector<Cell>			cells;
 	std::vector<bool>			connections;

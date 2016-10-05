@@ -3,15 +3,8 @@
 class Rasterizer;
 class Shader;
 class PixelEmitter;
-
-class IColorBufferAdaptor
-{
-public:
-	virtual void WriteRenderTarget(int x, int y, const float* color) = 0;
-	virtual int GetBufferWidth() const = 0;
-	virtual int GetBufferHeight() const = 0;
-	virtual void ClearColorBuffer(const float* color) = 0;
-};
+class Mesh;
+class IColorBufferAdaptor;
 
 class Pipeline
 {
@@ -30,6 +23,7 @@ public:
 	void SetConstantBuffer(const float* buffer);
 
 	int Draw(const float* vertices, size_t numVertices, const int* indices, size_t numIndices);
+	int Draw(const Mesh* mesh);
 
 private:
 	friend class PixelEmitter;
