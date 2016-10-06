@@ -1,7 +1,5 @@
 #pragma once
 
-class Engine;
-
 class Entity
 {
 public:
@@ -18,8 +16,8 @@ private:
 
 private:
 	Entity*		parent;
-	bool		dirty;
-	bool		modified;
+	bool		dirty;				// if position information of this node changed within this frame
+	bool		modified;			// if matrix have been updated during this frame
 	float		matrix[16];
 	float		worldMatrix[16];
 };

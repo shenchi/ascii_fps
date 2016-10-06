@@ -4,6 +4,11 @@
 
 using namespace glm;
 
+void Camera::SetLookAt(float x, float y, float z, float upX, float upY, float upZ, float lookAtX, float lookAtY, float lookAtZ)
+{
+	*reinterpret_cast<mat4*>(viewMatrix) = lookAt(vec3(x, y, z), vec3(lookAtX, lookAtY, lookAtZ), vec3(upX, upY, upZ));
+}
+
 void Camera::SetPerspectiveProjection(float fov, float aspect, float zNear, float zFar)
 {
 	fov = fov / 180.0f * 3.14159265f;

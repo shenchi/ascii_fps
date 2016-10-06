@@ -6,6 +6,8 @@
 #include "EntityManager.h"
 #include "Camera.h"
 #include <chrono>
+#include <vector>
+#include <glm/glm.hpp>
 
 namespace
 {
@@ -64,6 +66,9 @@ int Engine::Run()
 	auto lastTime = timer::now();
 	char title[256] = {};
 
+	// TODO maybe it should be a list of rendertask
+	std::vector<Entity*> renderList;
+
 	// TODO: put this into camera
 	float backgroundColor[] = { 0.0f, 0.0f, 0.0f, 1.0f };
 
@@ -86,6 +91,7 @@ int Engine::Run()
 		sprintf_s(title, "delta time: %.4f, mouse position: (%7d, %7d)", deltaTime, window->GetMousePositionX(), window->GetMousePositionY());
 		window->SetTitleA(title);
 
+		renderList.clear();
 
 		// Update
 		for (auto entity = entities->Begin(); entity != entities->End(); ++entity)
@@ -95,15 +101,31 @@ int Engine::Run()
 			(*entity)->OnUpdate(deltaTime);
 		}
 
+		// Update all position informations
 		for (auto entity = entities->Begin(); entity != entities->End(); ++entity)
 		{
 			(*entity)->UpdateMatrix();
 		}
 
+		// TODO frustrum culling? visibility culling? depth-based sroting?
+		for (auto entity = entities->Begin(); entity != entities->End(); ++entity)
+		{
+			renderList.push_back(*entity);
+		}
+
 		pipeline->Clear(backgroundColor, 1.0f);
 
-		// Render
+		// Update Camera
+		glm::mat4 matVP = (*reinterpret_cast<glm::mat4*>(camera->projectionMatrix)) * (*reinterpret_cast<glm::mat4*>(camera->viewMatrix));
+		glm::mat4 matMVP(1.0f);
 
+		// Render
+		for (auto entity = renderList.begin(); entity != renderList.end(); ++entity)
+		{
+			matMVP = matVP * (*reinterpret_cast<glm::mat4*>((*entity)->worldMatrix));
+			pipeline->SetConstantBuffer(reinterpret_cast<float*>(&matMVP));
+			//pipeline->Draw(mesh);
+		}
 
 		window->Flush();
 		window->SwapBuffers();

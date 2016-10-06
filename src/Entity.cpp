@@ -19,16 +19,19 @@ void Entity::OnUpdate(float deltaTime)
 
 void Entity::UpdateMatrix()
 {
-	// TODO
-	std::vector<Entity*> stack;
 	Entity* topmost = nullptr;
 	Entity* p = this;
 
 	while (p != nullptr)
 	{
+		if (p->dirty)
+		{
+			topmost = p;
+		}
 		if (p->modified)
 		{
 			topmost = p;
+			break;
 		}
 		p = p->parent;
 	}
@@ -38,6 +41,8 @@ void Entity::UpdateMatrix()
 		return;
 	}
 
+	std::vector<Entity*> stack;
+
 	p = this;
 	while (p != topmost)
 	{
@@ -46,17 +51,29 @@ void Entity::UpdateMatrix()
 	}
 	stack.push_back(topmost);
 
+	size_t i = stack.size() - 1;
+	while (i >= 0 && stack[i]->modified)
+	{
+		i--;
+	}
+
+	if (i < 0)
+	{
+		return;
+	}
+
 	glm::mat4 worldMat(1.0f);
-	if (nullptr != topmost->parent)
+	if (nullptr != stack[i]->parent)
 	{
 		worldMat = *reinterpret_cast<glm::mat4*>(topmost->parent->worldMatrix);
 	}
 
-	for (size_t i = stack.size() - 1; i >= 0; --i)
+	for (; i >= 0; --i)
 	{
-		glm::mat4& mat = *reinterpret_cast<glm::mat4*>(stack[i]->matrix);
-		worldMat = worldMat * mat;
+		glm::mat4& localMat = *reinterpret_cast<glm::mat4*>(stack[i]->matrix);
+		worldMat *= localMat;
 		*reinterpret_cast<glm::mat4*>(stack[i]->worldMatrix) = worldMat;
 		stack[i]->dirty = false;
+		stack[i]->modified = true;
 	}
 }
