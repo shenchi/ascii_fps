@@ -6,6 +6,7 @@ class ConsoleWindow;
 class IColorBufferAdaptor;
 class Rasterizer;
 class Pipeline;
+class EntityManager;
 
 class Engine
 {
@@ -19,7 +20,7 @@ public:
 	inline void				Quit() { running = false; }
 
 	inline Camera*			GetCamera() { return camera; }
-	Entity*					CreateEntity();
+	Entity*					CreateEntity(const char* type = nullptr);
 
 private:
 	bool					running;
@@ -29,4 +30,5 @@ private:
 	Rasterizer*				raster;
 	Pipeline*				pipeline;
 	Camera*					camera;
+	EntityManager*			entities;
 };

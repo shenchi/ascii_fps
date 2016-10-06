@@ -152,6 +152,8 @@
     <ClCompile Include="..\src\ConsoleWindowAdaptor.cpp" />
     <ClCompile Include="..\src\DungeonMap.cpp" />
     <ClCompile Include="..\src\Engine.cpp" />
+    <ClCompile Include="..\src\Entity.cpp" />
+    <ClCompile Include="..\src\EntityManager.cpp" />
     <ClCompile Include="..\src\Game.cpp" />
     <ClCompile Include="..\src\main.cpp" />
     <ClCompile Include="..\src\MapGenerator.cpp" />
@@ -173,6 +175,7 @@
     <ClInclude Include="..\src\DungeonMap.h" />
     <ClInclude Include="..\src\Engine.h" />
     <ClInclude Include="..\src\Entity.h" />
+    <ClInclude Include="..\src\EntityManager.h" />
     <ClInclude Include="..\src\Game.h" />
     <ClInclude Include="..\src\MapGenerator.h" />
     <ClInclude Include="..\src\MapMesh.h" />

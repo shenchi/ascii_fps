@@ -3,6 +3,7 @@
 #include "ConsoleWindowAdaptor.h"
 #include "Rasterizer.h"
 #include "Pipeline.h"
+#include "EntityManager.h"
 #include "Camera.h"
 #include <chrono>
 
@@ -18,6 +19,7 @@ Engine::Engine()
 	adaptor(nullptr),
 	raster(nullptr),
 	pipeline(nullptr),
+	entities(nullptr),
 	camera(nullptr)
 {
 }
@@ -25,6 +27,7 @@ Engine::Engine()
 Engine::~Engine()
 {
 	if (nullptr != camera) delete camera;
+	if (nullptr != entities) delete entities;
 	if (nullptr != pipeline) delete pipeline;
 	if (nullptr != raster) delete raster;
 	if (nullptr != adaptor) delete adaptor;
@@ -45,6 +48,8 @@ int Engine::Initialize()
 	adaptor = new ConsoleWindowAdaptor(window);
 	raster = new Rasterizer(adaptor->GetBufferWidth(), adaptor->GetBufferHeight());
 	pipeline = new Pipeline(raster, adaptor);
+
+	entities = new EntityManager();
 
 	camera = new Camera();
 	camera->SetPerspectiveProjection(60.f, 0.5f * adaptor->GetBufferWidth() / adaptor->GetBufferHeight(), 0.5f, 100.0f);
@@ -83,17 +88,36 @@ int Engine::Run()
 
 
 		// Update
-		// iterate all entity
+		for (auto entity = entities->Begin(); entity != entities->End(); ++entity)
+		{
+			(*entity)->dirty = false;
+			(*entity)->modified = false;
+			(*entity)->OnUpdate(deltaTime);
+		}
+
+		for (auto entity = entities->Begin(); entity != entities->End(); ++entity)
+		{
+			(*entity)->UpdateMatrix();
+		}
 
 		pipeline->Clear(backgroundColor, 1.0f);
 
 		// Render
-		// iterate all renderer abstract object
+
 
 		window->Flush();
 		window->SwapBuffers();
 	}
 
 	return 0;
+}
+
+Entity * Engine::CreateEntity(const char* type)
+{
+	if (nullptr == type)
+	{
+		return entities->CreateEntity<Entity>();
+	}
+	return entities->CreateEntity(type);
 }
 

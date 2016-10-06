@@ -50,6 +50,12 @@
     <ClCompile Include="..\src\Camera.cpp">
       <Filter>Engine</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\EntityManager.cpp">
+      <Filter>Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Entity.cpp">
+      <Filter>Engine</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\Shader.h">
@@ -106,6 +112,9 @@
     <ClInclude Include="..\src\Camera.h">
       <Filter>Engine</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\EntityManager.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
     <ClInclude Include="..\src\Entity.h">
       <Filter>Engine</Filter>
     </ClInclude>
@@ -128,6 +137,9 @@
     </Filter>
     <Filter Include="Gameplay">
       <UniqueIdentifier>{35f5b42c-6b3f-4730-b6a1-a60474c887ba}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Entities">
+      <UniqueIdentifier>{f5d6c9ee-44dc-4e9b-b04e-ac5d130c8465}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>
