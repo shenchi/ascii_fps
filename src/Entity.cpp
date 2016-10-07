@@ -77,3 +77,8 @@ void Entity::UpdateMatrix()
 		stack[i]->modified = true;
 	}
 }
+
+RenderTask * Entity::OnRender()
+{
+	return nullptr;
+}

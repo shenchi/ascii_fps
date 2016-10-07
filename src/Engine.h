@@ -14,13 +14,25 @@ public:
 	Engine();
 	~Engine();
 
-	int Initialize();
-	int Run();
+	//========================================================================
+	// interface functions for initialization code
+	//
+	int						Initialize();
+	int						Run();
 
+
+	//========================================================================
+	// interface functions for entity code
+	//
 	inline void				Quit() { running = false; }
 
 	inline Camera*			GetCamera() { return camera; }
 	Entity*					CreateEntity(const char* type = nullptr);
+
+	//========================================================================
+	// instance getters
+	//
+	inline EntityManager*	GetEntityManager() { return entities; }
 
 private:
 	bool					running;

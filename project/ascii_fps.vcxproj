@@ -185,6 +185,7 @@
     <ClInclude Include="..\src\Pipeline.h" />
     <ClInclude Include="..\src\PixelEmitter.h" />
     <ClInclude Include="..\src\Rasterizer.h" />
+    <ClInclude Include="..\src\RenderTask.h" />
     <ClInclude Include="..\src\Shader.h" />
     <ClInclude Include="..\src\WinAPIDebug.h" />
   </ItemGroup>

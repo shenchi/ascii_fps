@@ -1,5 +1,7 @@
 #pragma once
 
+class RenderTask;
+
 class Entity
 {
 public:
@@ -13,6 +15,7 @@ public:
 private:
 	friend class Engine;
 	void		UpdateMatrix();
+	RenderTask*	OnRender();
 
 private:
 	Entity*		parent;

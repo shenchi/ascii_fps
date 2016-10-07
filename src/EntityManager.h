@@ -25,9 +25,13 @@ public:
 	typedef std::vector<Entity*>::iterator& Iterator;
 
 	inline Iterator Begin() { return entities.begin(); }
-	inline Iterator End() { return entities.end; }
+	inline Iterator End() { return entities.end(); }
+
+	//
+	typedef std::function<Entity*(void)> EntityFactory;
+	inline void Register(const std::string& type, EntityFactory& factory) { entityTable.insert({type, factory}); }
 
 private:
-	std::vector<Entity*>											entities;
-	std::unordered_map<std::string, std::function<Entity*(void)> >	entityTable;
+	std::vector<Entity*>							entities;
+	std::unordered_map<std::string, EntityFactory>	entityTable;
 };

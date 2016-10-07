@@ -5,6 +5,7 @@
 #include "Pipeline.h"
 #include "EntityManager.h"
 #include "Camera.h"
+#include "RenderTask.h"
 #include <chrono>
 #include <vector>
 #include <glm/glm.hpp>
@@ -67,7 +68,7 @@ int Engine::Run()
 	char title[256] = {};
 
 	// TODO maybe it should be a list of rendertask
-	std::vector<Entity*> renderList;
+	std::vector<RenderTask*> renderList;
 
 	// TODO: put this into camera
 	float backgroundColor[] = { 0.0f, 0.0f, 0.0f, 1.0f };
@@ -110,7 +111,11 @@ int Engine::Run()
 		// TODO frustrum culling? visibility culling? depth-based sroting?
 		for (auto entity = entities->Begin(); entity != entities->End(); ++entity)
 		{
-			renderList.push_back(*entity);
+			RenderTask* task = (*entity)->OnRender();
+			if (nullptr != task)
+			{
+				renderList.push_back(task);
+			}
 		}
 
 		pipeline->Clear(backgroundColor, 1.0f);
@@ -120,11 +125,11 @@ int Engine::Run()
 		glm::mat4 matMVP(1.0f);
 
 		// Render
-		for (auto entity = renderList.begin(); entity != renderList.end(); ++entity)
+		for (auto task = renderList.begin(); task != renderList.end(); ++task)
 		{
-			matMVP = matVP * (*reinterpret_cast<glm::mat4*>((*entity)->worldMatrix));
+			matMVP = matVP * (*reinterpret_cast<const glm::mat4*>((*task)->worldMatrix));
 			pipeline->SetConstantBuffer(reinterpret_cast<float*>(&matMVP));
-			//pipeline->Draw(mesh);
+			pipeline->Draw((*task)->mesh);
 		}
 
 		window->Flush();
