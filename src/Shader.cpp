@@ -6,31 +6,31 @@ namespace
 {
 	using namespace glm;
 
-	/*
-	*/
-	class DefaultVertexShader : public Shader
-	{
-	public:
-		virtual void Main(const float* in, float* out) const
-		{
-			const vec4& pos = reinterpret_cast<const vec4&>(*in);
-			vec4& pos_out = reinterpret_cast<vec4&>(*out);
-			vec4& col_out = reinterpret_cast<vec4&>(*(out + 4));
+	///*
+	//*/
+	//class DefaultVertexShader : public Shader
+	//{
+	//public:
+	//	virtual void Main(const float* in, float* out) const
+	//	{
+	//		const vec4& pos = reinterpret_cast<const vec4&>(*in);
+	//		vec4& pos_out = reinterpret_cast<vec4&>(*out);
+	//		vec4& col_out = reinterpret_cast<vec4&>(*(out + 4));
 
-			pos_out = matMVP * pos;
-			col_out = pos + vec4(0.5f, 0.5f, 0.5f, 0.0f);
-		}
+	//		pos_out = matMVP * pos;
+	//		col_out = pos + vec4(0.5f, 0.5f, 0.5f, 0.0f);
+	//	}
 
-		virtual size_t Stride() const { return 4; }
+	//	virtual size_t Stride() const { return 4; }
 
-		virtual void SetConstantBuffer(const float* buffer)
-		{
-			matMVP = reinterpret_cast<const mat4&>(*buffer);
-		}
-	private:
-		mat4 matMVP;
-	};
-	DefaultVertexShader defaultVertexShader;
+	//	virtual void SetConstantBuffer(const float* buffer)
+	//	{
+	//		matMVP = reinterpret_cast<const mat4&>(*buffer);
+	//	}
+	//private:
+	//	mat4 matMVP;
+	//};
+	//DefaultVertexShader defaultVertexShader;
 
 	/*
 	*/
@@ -59,7 +59,8 @@ namespace
 	private:
 		mat4 matMVP;
 	};
-	PosNormColorVertexShader posNormColorVertexShader;
+	//PosNormColorVertexShader posNormColorVertexShader;
+	PosNormColorVertexShader defaultVertexShader;
 
 	/*
 	*/
@@ -86,7 +87,7 @@ namespace
 	Shader* vertexShaderArray[] = 
 	{
 		&defaultVertexShader,
-		&posNormColorVertexShader,
+		//&posNormColorVertexShader,
 	};
 
 	size_t registeredVertexShaderCount = sizeof(vertexShaderArray) / sizeof(vertexShaderArray[0]);

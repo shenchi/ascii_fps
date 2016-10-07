@@ -14,24 +14,16 @@ public:
 	Engine();
 	~Engine();
 
-	//========================================================================
-	// interface functions for initialization code
-	//
 	int						Initialize();
 	int						Run();
 
-
-	//========================================================================
-	// interface functions for entity code
-	//
 	inline void				Quit() { running = false; }
+
+	bool					IsKeyDown(unsigned char keyCode);
 
 	inline Camera*			GetCamera() { return camera; }
 	Entity*					CreateEntity(const char* type = nullptr);
 
-	//========================================================================
-	// instance getters
-	//
 	inline EntityManager*	GetEntityManager() { return entities; }
 
 private:

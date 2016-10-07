@@ -13,7 +13,15 @@ Entity::~Entity()
 {
 }
 
+void Entity::OnCreate()
+{
+}
+
 void Entity::OnUpdate(float deltaTime)
+{
+}
+
+void Entity::OnDestroy()
 {
 }
 

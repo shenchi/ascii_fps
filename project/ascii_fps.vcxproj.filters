@@ -56,6 +56,12 @@
     <ClCompile Include="..\src\Entity.cpp">
       <Filter>Engine</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\MapEntity.cpp">
+      <Filter>Gameplay</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\PlayerEntity.cpp">
+      <Filter>Gameplay</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\Shader.h">
@@ -120,6 +126,12 @@
     </ClInclude>
     <ClInclude Include="..\src\RenderTask.h">
       <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\MapEntity.h">
+      <Filter>Gameplay</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\PlayerEntity.h">
+      <Filter>Gameplay</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

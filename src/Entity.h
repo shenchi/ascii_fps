@@ -1,26 +1,35 @@
 #pragma once
 
-class RenderTask;
+struct RenderTask;
+class Engine;
 
 class Entity
 {
 public:
 	Entity();
-	~Entity();
+	virtual ~Entity();
 
-	inline Entity* GetParent() { return parent; }
+	inline Entity*		GetParent() { return parent; }
 
-	virtual void OnUpdate(float deltaTime);
+	virtual void		OnCreate();
+	virtual void		OnUpdate(float deltaTime);
+	virtual void		OnDestroy();
 
-private:
+protected:
 	friend class Engine;
-	void		UpdateMatrix();
-	RenderTask*	OnRender();
 
-private:
+	virtual RenderTask*	OnRender();
+
+protected:
+	Engine*		engine;
 	Entity*		parent;
-	bool		dirty;				// if position information of this node changed within this frame
-	bool		modified;			// if matrix have been updated during this frame
 	float		matrix[16];
 	float		worldMatrix[16];
+
+private:
+	void		UpdateMatrix();
+
+private:
+	bool		dirty;				// if position information of this node changed within this frame
+	bool		modified;			// if matrix have been updated during this frame
 };

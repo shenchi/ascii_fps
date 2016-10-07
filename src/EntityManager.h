@@ -12,6 +12,19 @@ public:
 	EntityManager();
 	~EntityManager();
 
+public:
+	// use such interface in case we wanna change underlying implementation
+	typedef std::vector<Entity*>::iterator Iterator;
+
+	inline Iterator Begin() { return entities.begin(); }
+	inline Iterator End() { return entities.end(); }
+
+	//
+	typedef std::function<Entity*(void)> EntityFactory;
+	inline void Register(const std::string& type, EntityFactory factory) { entityTable.insert({type, factory}); }
+
+private:
+	friend class Engine;
 	template<class T>
 	inline Entity* CreateEntity() {
 		T* entity = new T();
@@ -20,16 +33,6 @@ public:
 	}
 
 	Entity* CreateEntity(const std::string& type);
-
-	// use such interface in case we wanna change underlying implementation
-	typedef std::vector<Entity*>::iterator& Iterator;
-
-	inline Iterator Begin() { return entities.begin(); }
-	inline Iterator End() { return entities.end(); }
-
-	//
-	typedef std::function<Entity*(void)> EntityFactory;
-	inline void Register(const std::string& type, EntityFactory& factory) { entityTable.insert({type, factory}); }
 
 private:
 	std::vector<Entity*>							entities;

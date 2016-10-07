@@ -1,5 +1,6 @@
 #include "PixelEmitter.h"
 #include "Pipeline.h"
+#include "ColorBufferAdaptor.h"
 #include "Shader.h"
 
 #define x1 screenPosisions[0]

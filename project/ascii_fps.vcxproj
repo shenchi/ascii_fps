@@ -156,6 +156,7 @@
     <ClCompile Include="..\src\EntityManager.cpp" />
     <ClCompile Include="..\src\Game.cpp" />
     <ClCompile Include="..\src\main.cpp" />
+    <ClCompile Include="..\src\MapEntity.cpp" />
     <ClCompile Include="..\src\MapGenerator.cpp" />
     <ClCompile Include="..\src\MapMesh.cpp" />
     <ClCompile Include="..\src\Mesh.cpp" />
@@ -163,6 +164,7 @@
     <ClCompile Include="..\src\ObjMeshDumpper.cpp" />
     <ClCompile Include="..\src\Pipeline.cpp" />
     <ClCompile Include="..\src\PixelEmitter.cpp" />
+    <ClCompile Include="..\src\PlayerEntity.cpp" />
     <ClCompile Include="..\src\Rasterizer.cpp" />
     <ClCompile Include="..\src\Shader.cpp" />
   </ItemGroup>
@@ -177,6 +179,7 @@
     <ClInclude Include="..\src\Entity.h" />
     <ClInclude Include="..\src\EntityManager.h" />
     <ClInclude Include="..\src\Game.h" />
+    <ClInclude Include="..\src\MapEntity.h" />
     <ClInclude Include="..\src\MapGenerator.h" />
     <ClInclude Include="..\src\MapMesh.h" />
     <ClInclude Include="..\src\Mesh.h" />
@@ -184,6 +187,7 @@
     <ClInclude Include="..\src\ObjMeshDumpper.h" />
     <ClInclude Include="..\src\Pipeline.h" />
     <ClInclude Include="..\src\PixelEmitter.h" />
+    <ClInclude Include="..\src\PlayerEntity.h" />
     <ClInclude Include="..\src\Rasterizer.h" />
     <ClInclude Include="..\src\RenderTask.h" />
     <ClInclude Include="..\src\Shader.h" />

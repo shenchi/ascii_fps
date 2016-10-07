@@ -44,7 +44,7 @@ Engine::~Engine()
 int Engine::Initialize()
 {
 	// TODO: read some parameters from config file
-
+	window = new ConsoleWindow();
 	int ret = window->Create(L"Test Console API", 800 / 4, 600 / 8, 4, 8);		// low res
 	//int ret = window.Create(L"Test Console API", 1200 / 3, 900 / 6, 3, 6);	// high res
 
@@ -139,12 +139,21 @@ int Engine::Run()
 	return 0;
 }
 
-Entity * Engine::CreateEntity(const char* type)
+bool Engine::IsKeyDown(unsigned char keyCode)
 {
+	return window->IsKeyDown(keyCode);
+}
+
+Entity* Engine::CreateEntity(const char* type)
+{
+	Entity* entity = nullptr;
 	if (nullptr == type)
 	{
-		return entities->CreateEntity<Entity>();
+		entity = entities->CreateEntity<Entity>();
 	}
-	return entities->CreateEntity(type);
+	entity = entities->CreateEntity(type);
+
+	entity->engine = this;
+	return entity;
 }
 
