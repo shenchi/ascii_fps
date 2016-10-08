@@ -12,6 +12,7 @@ EntityManager::~EntityManager()
 {
 	for (auto i = entities.begin(); i != entities.end(); ++i)
 	{
+		(*i)->OnDestroy();
 		delete *i;
 	}
 }

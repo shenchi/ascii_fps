@@ -12,6 +12,8 @@ namespace // we don't want explose these to outside
 
 	int*		pMousePositionX = nullptr;
 	int*		pMousePositionY = nullptr;
+	int*		pMousePositionDeltaX = nullptr;
+	int*		pMousePositionDeltaY = nullptr;
 
 	LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{
@@ -33,6 +35,8 @@ namespace // we don't want explose these to outside
 
 			if (raw->header.dwType == RIM_TYPEMOUSE)
 			{
+				*pMousePositionDeltaX += raw->data.mouse.lLastX;
+				*pMousePositionDeltaY += raw->data.mouse.lLastY;
 				*pMousePositionX += raw->data.mouse.lLastX;
 				*pMousePositionY += raw->data.mouse.lLastY;
 			}
@@ -76,6 +80,8 @@ int MouseInputReceiver::Start(int* dataBlock)
 
 	pMousePositionX = dataBlock;
 	pMousePositionY = dataBlock + 1;
+	pMousePositionDeltaX = dataBlock + 2;
+	pMousePositionDeltaY = dataBlock + 3;
 
 	return 0;
 }
@@ -84,6 +90,9 @@ void MouseInputReceiver::Update()
 {
 	if (nullptr == hWnd)
 		return;
+
+	*pMousePositionDeltaX = 0;
+	*pMousePositionDeltaY = 0;
 
 	MSG msg;
 	while (PeekMessage(&msg, hWnd, 0, 0, PM_REMOVE))

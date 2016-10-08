@@ -18,6 +18,8 @@ struct ConsoleWindowDatas
 	WNDPROC			pWndProc;
 	int				mousePosX;
 	int				mousePosY;
+	int				mousePosDeltaX;
+	int				mousePosDeltaY;
 };
 
 ConsoleWindow::ConsoleWindow()
@@ -251,6 +253,22 @@ int ConsoleWindow::GetMousePositionX() const
 int ConsoleWindow::GetMousePositionY() const
 {
 	return datas->mousePosY;
+}
+
+void ConsoleWindow::GetMouseDeltaPosition(int & x, int & y) const
+{
+	x = datas->mousePosDeltaX;
+	y = datas->mousePosDeltaY;
+}
+
+int ConsoleWindow::GetMousePositionDeltaX() const
+{
+	return datas->mousePosDeltaX;
+}
+
+int ConsoleWindow::GetMousePositionDeltaY() const
+{
+	return datas->mousePosDeltaY;
 }
 
 short ConsoleWindow::GetBufferWidth() const

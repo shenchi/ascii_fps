@@ -15,21 +15,55 @@ public:
 	virtual void		OnUpdate(float deltaTime);
 	virtual void		OnDestroy();
 
+	void				SetPosition(float x, float y, float z);
+	void				SetRotation(float x, float y, float z);
+	void				SetScale(float x, float y, float z);
+
+	inline float		GetPositionX() const { return posX; }
+	inline float		GetPositionY() const { return posY; }
+	inline float		GetPositionZ() const { return posZ; }
+
+	inline float		GetRotationX() const { return rotX; }
+	inline float		GetRotationY() const { return rotY; }
+	inline float		GetRotationZ() const { return rotZ; }
+
+	inline float		GetScaleX() const { return scaleX; }
+	inline float		GetScaleY() const { return scaleY; }
+	inline float		GetScaleZ() const { return scaleZ; }
+
+	inline void			SetPositionX(float v) { posX = v; dirty = true; }
+	inline void			SetPositionY(float v) { posY = v; dirty = true; }
+	inline void			SetPositionZ(float v) { posZ = v; dirty = true; }
+
+	inline void			SetRotationX(float v) { rotX = v; dirty = true; }
+	inline void			SetRotationY(float v) { rotY = v; dirty = true; }
+	inline void			SetRotationZ(float v) { rotZ = v; dirty = true; }
+
+	inline void			SetScaleX(float v) { scaleX = v; dirty = true; }
+	inline void			SetScaleY(float v) { scaleY = v; dirty = true; }
+	inline void			SetScaleZ(float v) { scaleZ = v; dirty = true; }
+
+	inline const float*	GetMatrix() { return matrix; }
+	inline const float*	GetWorldMatrix() { return worldMatrix; }
+
 protected:
 	friend class Engine;
 
 	virtual RenderTask*	OnRender();
 
+	void		UpdateLocalMatrix();
+	void		UpdateWorldMatrix();
+
 protected:
 	Engine*		engine;
 	Entity*		parent;
-	float		matrix[16];
-	float		worldMatrix[16];
 
 private:
-	void		UpdateMatrix();
-
-private:
-	bool		dirty;				// if position information of this node changed within this frame
-	bool		modified;			// if matrix have been updated during this frame
+	bool		dirty;					// if position information of this node changed within this frame
+	bool		modified;				// if matrix have been updated during this frame
+	float		posX, posY, posZ;		// local coordinate
+	float		rotX, rotY, rotZ;		// local euler roation
+	float		scaleX, scaleY, scaleZ;	// local scale
+	float		matrix[16];				// local transform matrix
+	float		worldMatrix[16];		// world transform matrix
 };

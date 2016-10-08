@@ -2,11 +2,18 @@
 
 #include <vector>
 #include <glm/glm.hpp>
+#include <glm/gtx/transform.hpp>
+#include <glm/gtx/euler_angles.hpp>
 
 Entity::Entity()
 	:
-	parent(nullptr)
+	parent(nullptr),
+	posX(0.0f), posY(0.0f), posZ(0.0f),
+	rotX(0.0f), rotY(0.0f), rotZ(0.0f),
+	scaleX(1.0f), scaleY(1.0f), scaleZ(1.0f)
 {
+	*reinterpret_cast<glm::mat4*>(matrix) = glm::mat4(1.0f);
+	*reinterpret_cast<glm::mat4*>(worldMatrix) = glm::mat4(1.0f);
 }
 
 Entity::~Entity()
@@ -25,7 +32,41 @@ void Entity::OnDestroy()
 {
 }
 
-void Entity::UpdateMatrix()
+void Entity::SetPosition(float x, float y, float z)
+{
+	posX = x;
+	posY = y;
+	posZ = z;
+	dirty = true;
+}
+
+void Entity::SetRotation(float x, float y, float z)
+{
+	rotX = x;
+	rotY = y;
+	rotZ = z;
+	dirty = true;
+}
+
+void Entity::SetScale(float x, float y, float z)
+{
+	scaleX = x;
+	scaleY = y;
+	scaleZ = z;
+	dirty = true;
+}
+
+void Entity::UpdateLocalMatrix()
+{
+	if (!dirty) return;
+	*reinterpret_cast<glm::mat4*>(matrix) =
+		glm::translate(glm::vec3(posX, posY, posZ)) *
+		glm::eulerAngleYXZ(rotY, rotX, rotZ) *
+		glm::scale(glm::vec3(scaleX, scaleY, scaleZ));
+	dirty = false;
+}
+
+void Entity::UpdateWorldMatrix()
 {
 	Entity* topmost = nullptr;
 	Entity* p = this;
@@ -59,7 +100,7 @@ void Entity::UpdateMatrix()
 	}
 	stack.push_back(topmost);
 
-	size_t i = stack.size() - 1;
+	int i = int(stack.size()) - 1;
 	while (i >= 0 && stack[i]->modified)
 	{
 		i--;
@@ -78,6 +119,7 @@ void Entity::UpdateMatrix()
 
 	for (; i >= 0; --i)
 	{
+		stack[i]->UpdateLocalMatrix();
 		glm::mat4& localMat = *reinterpret_cast<glm::mat4*>(stack[i]->matrix);
 		worldMat *= localMat;
 		*reinterpret_cast<glm::mat4*>(stack[i]->worldMatrix) = worldMat;

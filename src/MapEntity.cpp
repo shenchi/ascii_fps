@@ -6,7 +6,7 @@ MapEntity::MapEntity()
 	Entity(),
 	task(new RenderTask())
 {
-	task->worldMatrix = worldMatrix;
+	task->worldMatrix = GetWorldMatrix();
 }
 
 MapEntity::~MapEntity()

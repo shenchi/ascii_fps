@@ -28,6 +28,10 @@ public:
 	int		GetMousePositionX() const;
 	int		GetMousePositionY() const;
 
+	void	GetMouseDeltaPosition(int& x, int& y) const;
+	int		GetMousePositionDeltaX() const;
+	int		GetMousePositionDeltaY() const;
+
 	short	GetBufferWidth() const;
 	short	GetBufferHeight() const;
 

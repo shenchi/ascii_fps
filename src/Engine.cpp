@@ -55,7 +55,7 @@ int Engine::Initialize()
 	entities = new EntityManager();
 
 	camera = new Camera();
-	camera->SetPerspectiveProjection(60.f, 0.5f * adaptor->GetBufferWidth() / adaptor->GetBufferHeight(), 0.5f, 100.0f);
+	camera->SetPerspectiveProjection(45.0f, 0.5f * adaptor->GetBufferWidth() / adaptor->GetBufferHeight(), 0.5f, 100.0f);
 
 	return ret;
 }
@@ -76,8 +76,6 @@ int Engine::Run()
 	running = true;
 	while (running)
 	{
-		window->Update();
-
 		auto now = timer::now();
 		float deltaTime = std::chrono::duration<float>(now - lastTime).count();
 
@@ -88,6 +86,8 @@ int Engine::Run()
 
 		lastTime = now;
 		elapsed = deltaTime + elapsed - interval;
+
+		window->Update();
 
 		sprintf_s(title, "delta time: %.4f, mouse position: (%7d, %7d)", deltaTime, window->GetMousePositionX(), window->GetMousePositionY());
 		window->SetTitleA(title);
@@ -105,7 +105,7 @@ int Engine::Run()
 		// Update all position informations
 		for (auto entity = entities->Begin(); entity != entities->End(); ++entity)
 		{
-			(*entity)->UpdateMatrix();
+			(*entity)->UpdateWorldMatrix();
 		}
 
 		// TODO frustrum culling? visibility culling? depth-based sroting?
@@ -121,7 +121,9 @@ int Engine::Run()
 		pipeline->Clear(backgroundColor, 1.0f);
 
 		// Update Camera
-		glm::mat4 matVP = (*reinterpret_cast<glm::mat4*>(camera->projectionMatrix)) * (*reinterpret_cast<glm::mat4*>(camera->viewMatrix));
+		glm::mat4 matView = *reinterpret_cast<glm::mat4*>(camera->viewMatrix);
+		glm::mat4 matProj = *reinterpret_cast<glm::mat4*>(camera->projectionMatrix);
+		glm::mat4 matVP = matProj * matView;
 		glm::mat4 matMVP(1.0f);
 
 		// Render
@@ -139,9 +141,29 @@ int Engine::Run()
 	return 0;
 }
 
-bool Engine::IsKeyDown(unsigned char keyCode)
+bool Engine::IsKeyDown(unsigned char keyCode) const
 {
 	return window->IsKeyDown(keyCode);
+}
+
+int Engine::GetMousePositionX() const
+{
+	return window->GetMousePositionX();
+}
+
+int Engine::GetMousePositionY() const
+{
+	return window->GetMousePositionY();
+}
+
+int Engine::GetMousePositionDeltaX() const
+{
+	return window->GetMousePositionDeltaX();
+}
+
+int Engine::GetMousePositionDeltaY() const
+{
+	return window->GetMousePositionDeltaY();
 }
 
 Entity* Engine::CreateEntity(const char* type)
@@ -154,6 +176,7 @@ Entity* Engine::CreateEntity(const char* type)
 	entity = entities->CreateEntity(type);
 
 	entity->engine = this;
+	entity->OnCreate();
 	return entity;
 }
 

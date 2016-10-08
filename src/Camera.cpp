@@ -14,3 +14,13 @@ void Camera::SetPerspectiveProjection(float fov, float aspect, float zNear, floa
 	fov = fov / 180.0f * 3.14159265f;
 	*reinterpret_cast<mat4*>(projectionMatrix) = perspective(fov, aspect, zNear, zFar);
 }
+
+void Camera::SetViewMatrix(const float* matrix)
+{
+	memcpy(viewMatrix, matrix, sizeof(float) * 16);
+}
+
+void Camera::SetProjectionMatrix(const float* matrix)
+{
+	memcpy(projectionMatrix, matrix, sizeof(float) * 16);
+}

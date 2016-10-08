@@ -19,7 +19,11 @@ public:
 
 	inline void				Quit() { running = false; }
 
-	bool					IsKeyDown(unsigned char keyCode);
+	bool					IsKeyDown(unsigned char keyCode) const;
+	int						GetMousePositionX() const;
+	int						GetMousePositionY() const;
+	int						GetMousePositionDeltaX() const;
+	int						GetMousePositionDeltaY() const;
 
 	inline Camera*			GetCamera() { return camera; }
 	Entity*					CreateEntity(const char* type = nullptr);

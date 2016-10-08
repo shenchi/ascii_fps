@@ -34,7 +34,8 @@ int Game::Run()
 	MapEntity* mapEntity = dynamic_cast<MapEntity*>(engine->CreateEntity("MapEntity"));
 	mapEntity->SetMesh(map.GetMesh());
 
-	engine->CreateEntity("PlayerEntity");
+	PlayerEntity* playerEntity = dynamic_cast<PlayerEntity*>(engine->CreateEntity("PlayerEntity"));
+	playerEntity->SetPosition(map.GetStartPositionX(), 1.0f, map.GetStartPositionY());
 
 	return engine->Run();
 }

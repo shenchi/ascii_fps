@@ -13,8 +13,7 @@ public:
 private:
 	Camera*		camera;
 	float		turnSpeed;
-	float		angleHorizontal;
 	float		stepSpeed;
-	float		playerPositionX;
-	float		playerPositionZ;
+	float		mouseScaleX;
+	float		mouseScaleY;
 };
