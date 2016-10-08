@@ -127,6 +127,10 @@ int ConsoleWindow::Create(const wchar_t* title, short _bufferWidth, short _buffe
 		int winX = (screenWidth - winWidth) / 2;
 		int winY = (screenHeight - winHeight) / 2;
 		SetWindowPos(datas->hWnd, nullptr, winX, winY, 0, 0, SWP_NOSIZE);
+
+		desktopRect.left = desktopRect.right;
+		desktopRect.top = desktopRect.bottom;
+		ClipCursor(&desktopRect);
 	}
 
 	MouseInputReceiver::Start(&(datas->mousePosX));
@@ -140,6 +144,8 @@ int ConsoleWindow::Destroy()
 	{
 		return -1;
 	}
+
+	ClipCursor(nullptr);
 
 	MouseInputReceiver::Stop();
 
@@ -171,16 +177,6 @@ int ConsoleWindow::SetTitleA(const char * title)
 
 int ConsoleWindow::Update()
 {
-	// nothing to do right now
-	// we use GetAsyncKeyState() instead of GetKeyboardState()
-
-	/*if (nullptr == datas)
-	{
-		return -1;
-	}
-
-	CHECK(GetKeyboardState(datas->keyStates));*/
-
 	MouseInputReceiver::Update();
 
 	return 0;
