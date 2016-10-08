@@ -115,6 +115,20 @@ int ConsoleWindow::Create(const wchar_t* title, short _bufferWidth, short _buffe
 		}
 	}
 
+	{
+		RECT windowRect;
+		RECT desktopRect;
+		GetWindowRect(datas->hWnd, &windowRect);
+		GetClientRect(GetDesktopWindow(), &desktopRect);
+		int winWidth = windowRect.right - windowRect.left;
+		int winHeight = windowRect.bottom - windowRect.top;
+		int screenWidth = desktopRect.right - desktopRect.left;
+		int screenHeight = desktopRect.bottom - desktopRect.top;
+		int winX = (screenWidth - winWidth) / 2;
+		int winY = (screenHeight - winHeight) / 2;
+		SetWindowPos(datas->hWnd, nullptr, winX, winY, 0, 0, SWP_NOSIZE);
+	}
+
 	MouseInputReceiver::Start(&(datas->mousePosX));
 
 	return 0;
