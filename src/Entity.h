@@ -10,6 +10,10 @@ public:
 	virtual ~Entity();
 
 	inline Entity*		GetParent() { return parent; }
+	inline void			SetParent(Entity* entity) { parent = entity; dirty = true; }
+
+	inline bool			Visible() const { return visible; }
+	inline void			SetVisible(bool v) { visible = v; }
 
 	virtual void		OnCreate();
 	virtual void		OnUpdate(float deltaTime);
@@ -59,6 +63,7 @@ protected:
 	Entity*		parent;
 
 private:
+	bool		visible;
 	bool		dirty;					// if position information of this node changed within this frame
 	bool		modified;				// if matrix have been updated during this frame
 	float		posX, posY, posZ;		// local coordinate

@@ -6,35 +6,9 @@ namespace
 {
 	using namespace glm;
 
-	///*
-	//*/
-	//class DefaultVertexShader : public Shader
-	//{
-	//public:
-	//	virtual void Main(const float* in, float* out) const
-	//	{
-	//		const vec4& pos = reinterpret_cast<const vec4&>(*in);
-	//		vec4& pos_out = reinterpret_cast<vec4&>(*out);
-	//		vec4& col_out = reinterpret_cast<vec4&>(*(out + 4));
-
-	//		pos_out = matMVP * pos;
-	//		col_out = pos + vec4(0.5f, 0.5f, 0.5f, 0.0f);
-	//	}
-
-	//	virtual size_t Stride() const { return 4; }
-
-	//	virtual void SetConstantBuffer(const float* buffer)
-	//	{
-	//		matMVP = reinterpret_cast<const mat4&>(*buffer);
-	//	}
-	//private:
-	//	mat4 matMVP;
-	//};
-	//DefaultVertexShader defaultVertexShader;
-
 	/*
 	*/
-	class PosNormColorVertexShader : public Shader
+	class DefaultVertexShader : public Shader
 	{
 	public:
 		virtual void Main(const float* in, float* out) const
@@ -46,21 +20,32 @@ namespace
 			vec4& pos_out = reinterpret_cast<vec4&>(*out);
 			vec4& col_out = reinterpret_cast<vec4&>(*(out + 4));
 
-			pos_out = matMVP * vec4(pos, 1.0f);
-			col_out = vec4(col, 1.0f);
+			vec3 worldNorm = normalize(vec3((*matWorld) * vec4(norm, 0.0f)));
+
+			static vec3 light_dir = normalize(vec3(1.0f, 1.0f, -1.0f));
+			
+			pos_out = (*matMVP) * vec4(pos, 1.0f);
+			col_out = vec4(col * clamp(dot(worldNorm, light_dir), 0.0f, 1.0f) + vec3(0.5f, 0.5f, 0.5f), 1.0f);
+			//col_out = vec4(worldNorm * 0.5f + vec3(0.5f, 0.5f, 0.5f), 1.0f);
+			col_out = clamp(col_out, 0.01f, 0.99f);
 		}
 
 		virtual size_t Stride() const { return 9; }
 
 		virtual void SetConstantBuffer(const float* buffer)
 		{
-			matMVP = reinterpret_cast<const mat4&>(*buffer);
+			matMVP = reinterpret_cast<const mat4*>(buffer);
+			matWorld = reinterpret_cast<const mat4*>(buffer + 16);
+			matView = reinterpret_cast<const mat4*>(buffer + 32);
+			matProj = reinterpret_cast<const mat4*>(buffer + 48);
 		}
 	private:
-		mat4 matMVP;
+		const mat4* matMVP;
+		const mat4* matWorld;
+		const mat4* matView;
+		const mat4* matProj;
 	};
-	//PosNormColorVertexShader posNormColorVertexShader;
-	PosNormColorVertexShader defaultVertexShader;
+	DefaultVertexShader defaultVertexShader;
 
 	/*
 	*/
@@ -87,7 +72,6 @@ namespace
 	Shader* vertexShaderArray[] = 
 	{
 		&defaultVertexShader,
-		//&posNormColorVertexShader,
 	};
 
 	size_t registeredVertexShaderCount = sizeof(vertexShaderArray) / sizeof(vertexShaderArray[0]);

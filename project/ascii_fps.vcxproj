@@ -160,6 +160,8 @@
     <ClCompile Include="..\src\MapGenerator.cpp" />
     <ClCompile Include="..\src\MapMesh.cpp" />
     <ClCompile Include="..\src\Mesh.cpp" />
+    <ClCompile Include="..\src\MeshEntity.cpp" />
+    <ClCompile Include="..\src\MeshLoader.cpp" />
     <ClCompile Include="..\src\MouseInputReceiver.cpp" />
     <ClCompile Include="..\src\ObjMeshDumpper.cpp" />
     <ClCompile Include="..\src\Pipeline.cpp" />
@@ -183,6 +185,8 @@
     <ClInclude Include="..\src\MapGenerator.h" />
     <ClInclude Include="..\src\MapMesh.h" />
     <ClInclude Include="..\src\Mesh.h" />
+    <ClInclude Include="..\src\MeshEntity.h" />
+    <ClInclude Include="..\src\MeshLoader.h" />
     <ClInclude Include="..\src\MouseInputReceiver.h" />
     <ClInclude Include="..\src\ObjMeshDumpper.h" />
     <ClInclude Include="..\src\Pipeline.h" />

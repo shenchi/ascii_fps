@@ -14,6 +14,8 @@ public:
 	float GetStartPositionX() const;
 	float GetStartPositionY() const;
 
+	void MoveInMap(float& destX, float& destY, float radius) const;
+
 	inline const Mesh* GetMesh() const { return mesh; }
 
 private:

@@ -7,7 +7,11 @@
 
 Entity::Entity()
 	:
+	engine(nullptr),
 	parent(nullptr),
+	visible(true),
+	dirty(false),
+	modified(false),
 	posX(0.0f), posY(0.0f), posZ(0.0f),
 	rotX(0.0f), rotY(0.0f), rotZ(0.0f),
 	scaleX(1.0f), scaleY(1.0f), scaleZ(1.0f)
@@ -114,7 +118,7 @@ void Entity::UpdateWorldMatrix()
 	glm::mat4 worldMat(1.0f);
 	if (nullptr != stack[i]->parent)
 	{
-		worldMat = *reinterpret_cast<glm::mat4*>(topmost->parent->worldMatrix);
+		worldMat = *reinterpret_cast<glm::mat4*>(stack[i]->parent->worldMatrix);
 	}
 
 	for (; i >= 0; --i)

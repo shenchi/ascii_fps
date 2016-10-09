@@ -8,6 +8,8 @@
 #include "DungeonMap.h"
 #include "MapEntity.h"
 #include "PlayerEntity.h"
+#include "Mesh.h"
+#include "MeshEntity.h"
 
 Game::Game()
 	:engine(new Engine())
@@ -33,9 +35,22 @@ int Game::Run()
 
 	MapEntity* mapEntity = dynamic_cast<MapEntity*>(engine->CreateEntity("MapEntity"));
 	mapEntity->SetMesh(map.GetMesh());
+	//mapEntity->SetVisible(false);
 
 	PlayerEntity* playerEntity = dynamic_cast<PlayerEntity*>(engine->CreateEntity("PlayerEntity"));
 	playerEntity->SetPosition(map.GetStartPositionX(), 1.0f, map.GetStartPositionY());
+	playerEntity->SetMap(&map);
+
+	MeshEntity* meshEntity = dynamic_cast<MeshEntity*>(engine->CreateEntity("MeshEntity"));
+	meshEntity->LoadMeshFromFile("../assets/sword.mesh");
+	meshEntity->SetParent(playerEntity);
+	meshEntity->SetPosition(0.2f, -0.15f, 0.6f);
+	meshEntity->SetScale(0.2f, 0.2f, 0.2f);
+	//meshEntity->SetPosition(map.GetStartPositionX() + 2.0f, 1.0f, map.GetStartPositionY() + 2.0f);
+
+	MeshEntity* cube = dynamic_cast<MeshEntity*>(engine->CreateEntity("MeshEntity"));
+	cube->SetMesh(Mesh::Cube());
+	cube->SetPosition(map.GetStartPositionX() + 6.0f, 1.0f, map.GetStartPositionY() + 6.0f);
 
 	return engine->Run();
 }

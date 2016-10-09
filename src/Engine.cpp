@@ -55,7 +55,7 @@ int Engine::Initialize()
 	entities = new EntityManager();
 
 	camera = new Camera();
-	camera->SetPerspectiveProjection(45.0f, 0.5f * adaptor->GetBufferWidth() / adaptor->GetBufferHeight(), 0.5f, 100.0f);
+	camera->SetPerspectiveProjection(45.0f, 0.5f * adaptor->GetBufferWidth() / adaptor->GetBufferHeight(), 0.5f, 80.0f);
 
 	return ret;
 }
@@ -72,6 +72,18 @@ int Engine::Run()
 
 	// TODO: put this into camera
 	float backgroundColor[] = { 0.0f, 0.0f, 0.0f, 1.0f };
+
+	glm::mat4 builtInMatrix[4] = {
+		glm::mat4(1.0f),	// MVP
+		glm::mat4(1.0f),	// World
+		glm::mat4(1.0f),	// View
+		glm::mat4(1.0f)		// Projection
+	};
+
+	glm::mat4& matMVP = builtInMatrix[0];
+	glm::mat4& matWorld = builtInMatrix[1];
+	glm::mat4& matView = builtInMatrix[2];
+	glm::mat4& matProj = builtInMatrix[3];
 
 	running = true;
 	while (running)
@@ -97,8 +109,6 @@ int Engine::Run()
 		// Update
 		for (auto entity = entities->Begin(); entity != entities->End(); ++entity)
 		{
-			(*entity)->dirty = false;
-			(*entity)->modified = false;
 			(*entity)->OnUpdate(deltaTime);
 		}
 
@@ -111,6 +121,9 @@ int Engine::Run()
 		// TODO frustrum culling? visibility culling? depth-based sroting?
 		for (auto entity = entities->Begin(); entity != entities->End(); ++entity)
 		{
+			(*entity)->dirty = false;
+			(*entity)->modified = false;
+
 			RenderTask* task = (*entity)->OnRender();
 			if (nullptr != task)
 			{
@@ -121,16 +134,16 @@ int Engine::Run()
 		pipeline->Clear(backgroundColor, 1.0f);
 
 		// Update Camera
-		glm::mat4 matView = *reinterpret_cast<glm::mat4*>(camera->viewMatrix);
-		glm::mat4 matProj = *reinterpret_cast<glm::mat4*>(camera->projectionMatrix);
+		matView = *reinterpret_cast<glm::mat4*>(camera->viewMatrix);
+		matProj = *reinterpret_cast<glm::mat4*>(camera->projectionMatrix);
 		glm::mat4 matVP = matProj * matView;
-		glm::mat4 matMVP(1.0f);
 
 		// Render
 		for (auto task = renderList.begin(); task != renderList.end(); ++task)
 		{
-			matMVP = matVP * (*reinterpret_cast<const glm::mat4*>((*task)->worldMatrix));
-			pipeline->SetConstantBuffer(reinterpret_cast<float*>(&matMVP));
+			matWorld = (*reinterpret_cast<const glm::mat4*>((*task)->worldMatrix));
+			matMVP = matVP * matWorld;
+			pipeline->SetConstantBuffer(reinterpret_cast<float*>(builtInMatrix));
 			pipeline->Draw((*task)->mesh);
 		}
 

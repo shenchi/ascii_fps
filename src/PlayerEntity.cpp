@@ -1,5 +1,6 @@
 #include "PlayerEntity.h"
 #include "Engine.h"
+#include "DungeonMap.h"
 
 #include <glm/glm.hpp>
 #include <glm/gtx/transform.hpp>
@@ -20,8 +21,8 @@ void PlayerEntity::OnUpdate(float deltaTime)
 	constexpr float angle90 = 3.1415926f * 0.5f;
 	float anglePitch = GetRotationX();
 	float angleYaw = GetRotationY();
-	float playerPositionX = GetPositionX();
-	float playerPositionZ = GetPositionZ();
+	float posX = GetPositionX();
+	float posZ = GetPositionZ();
 
 	angleYaw += engine->GetMousePositionDeltaX() * mouseScaleX;
 	anglePitch += engine->GetMousePositionDeltaY() * mouseScaleY;
@@ -32,32 +33,34 @@ void PlayerEntity::OnUpdate(float deltaTime)
 		anglePitch = -angle90;
 
 	if (engine->IsKeyDown('A')) {
-		playerPositionX -= deltaTime * stepSpeed * cos(angleYaw);
-		playerPositionZ += deltaTime * stepSpeed * sin(angleYaw);
+		posX -= deltaTime * stepSpeed * cos(angleYaw);
+		posZ += deltaTime * stepSpeed * sin(angleYaw);
 	}
 	else if (engine->IsKeyDown('D')) {
-		playerPositionX += deltaTime * stepSpeed * cos(angleYaw);
-		playerPositionZ -= deltaTime * stepSpeed * sin(angleYaw);
+		posX += deltaTime * stepSpeed * cos(angleYaw);
+		posZ -= deltaTime * stepSpeed * sin(angleYaw);
 	}
 
 	if (engine->IsKeyDown('W'))
 	{
-		playerPositionX += deltaTime * stepSpeed * sin(angleYaw);
-		playerPositionZ += deltaTime * stepSpeed * cos(angleYaw);
+		posX += deltaTime * stepSpeed * sin(angleYaw);
+		posZ += deltaTime * stepSpeed * cos(angleYaw);
 	}
 	else if (engine->IsKeyDown('S'))
 	{
-		playerPositionX -= deltaTime * stepSpeed * sin(angleYaw);
-		playerPositionZ -= deltaTime * stepSpeed * cos(angleYaw);
+		posX -= deltaTime * stepSpeed * sin(angleYaw);
+		posZ -= deltaTime * stepSpeed * cos(angleYaw);
 	}
+
+	map->MoveInMap(posX, posZ, 0.7f);
 
 	if (engine->IsKeyDown(27))
 	{
 		engine->Quit();
 	}
 	
-	SetPositionX(playerPositionX);
-	SetPositionZ(playerPositionZ);
+	SetPositionX(posX);
+	SetPositionZ(posZ);
 	SetRotationX(anglePitch);
 	SetRotationY(angleYaw);
 
@@ -68,5 +71,10 @@ void PlayerEntity::OnUpdate(float deltaTime)
 			*reinterpret_cast<const glm::mat4*>(GetWorldMatrix())
 		)))
 	);
+}
+
+void PlayerEntity::SetMap(DungeonMap * map)
+{
+	this->map = map;
 }
 

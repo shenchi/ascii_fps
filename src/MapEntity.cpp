@@ -25,7 +25,7 @@ void MapEntity::SetMesh(const Mesh * mesh)
 
 RenderTask* MapEntity::OnRender()
 {
-	if (nullptr != task)
+	if (Visible() && nullptr != task)
 	{
 		return task;
 	}

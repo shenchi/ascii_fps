@@ -71,8 +71,8 @@ void DungeonMap::Create()
 
 	// TODO
 	float color_tables[] = {
-		1.0f, 0.0f, 0.0f,
-		0.0f, 0.0f, 1.0f,
+		1.0f, 1.0f, 1.0f,
+		1.0f, 1.0f, 1.0f,
 		1.0f, 1.0f, 1.0f
 	};
 
@@ -100,4 +100,30 @@ float DungeonMap::GetStartPositionY() const
 		return 0.0f;
 	}
 	return gridSize * (mapGen->EntryY() - mapGen->Top() + 0.5f);
+}
+
+void DungeonMap::MoveInMap(float& destX, float& destY, float radius) const
+{
+	if (nullptr == mapData)
+	{
+		return;
+	}
+
+#define TEST(OFFSET_X, OFFSET_Y, COORD_VAR, GRID_COORD, COORD_OFFSET)\
+	{\
+		int dx = int((destX OFFSET_X) / gridSize);\
+		int dy = int((destY OFFSET_Y) / gridSize);\
+		char destType = mapData[dy * mapWidth + dx];\
+		if (destType != '.')\
+		{\
+			COORD_VAR = (GRID_COORD) * gridSize COORD_OFFSET;\
+		}\
+	}
+
+	TEST(+radius, , destX, dx, -radius);
+	TEST(-radius, , destX, dx + 1, +radius);
+	TEST(, +radius, destY, dy, -radius);
+	TEST(, -radius, destY, dy + 1, +radius);
+
+#undef TEST
 }
