@@ -115,6 +115,8 @@ int ConsoleWindow::Create(const wchar_t* title, short _bufferWidth, short _buffe
 		}
 	}
 
+	MouseInputReceiver::Start(&(datas->mousePosX));
+
 	{
 		RECT windowRect;
 		RECT desktopRect;
@@ -128,12 +130,11 @@ int ConsoleWindow::Create(const wchar_t* title, short _bufferWidth, short _buffe
 		int winY = (screenHeight - winHeight) / 2;
 		SetWindowPos(datas->hWnd, nullptr, winX, winY, 0, 0, SWP_NOSIZE);
 
-		desktopRect.left = desktopRect.right;
-		desktopRect.top = desktopRect.bottom;
-		ClipCursor(&desktopRect);
+		RECT clipRect = { winX + winWidth / 2, winY + 10, winX + winWidth / 2, winY + 10 };
+		//desktopRect.left = desktopRect.right;
+		//desktopRect.top = desktopRect.bottom;
+		ClipCursor(&clipRect);
 	}
-
-	MouseInputReceiver::Start(&(datas->mousePosX));
 
 	return 0;
 }
