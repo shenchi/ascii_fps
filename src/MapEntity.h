@@ -2,7 +2,7 @@
 
 #include "Entity.h"
 struct RenderTask;
-class Mesh;
+struct Mesh;
 
 class MapEntity : public Entity
 {

@@ -1,7 +1,7 @@
 #pragma once
 
 class MapGenerator;
-class Mesh;
+struct Mesh;
 
 class DungeonMap
 {

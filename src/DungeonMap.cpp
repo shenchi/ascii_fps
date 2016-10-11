@@ -81,7 +81,15 @@ void DungeonMap::Create()
 	const auto verts = mapMesh.GetVertices();
 	const auto idxs = mapMesh.GetIndices();
 
-	mesh = new Mesh(verts.size(), 9, idxs.size(), reinterpret_cast<const float*>(&(verts[0])), &(idxs[0]));
+	mesh = new Mesh();
+	mesh->format = VertexFormat(VertexPosition | VertexNormal | VertexColor);
+	mesh->verticesNum = verts.size();
+
+	mesh->vertices = ArrayBuffer<float>(verts.size() * mesh->format.Stride());
+	memcpy(mesh->vertices, &verts[0], sizeof(float) * mesh->vertices.size());
+
+	mesh->indices = ArrayBuffer<int>(idxs.size());
+	memcpy(mesh->indices, &idxs[0], sizeof(int) * idxs.size());
 }
 
 float DungeonMap::GetStartPositionX() const

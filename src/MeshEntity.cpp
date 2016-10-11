@@ -21,17 +21,20 @@ MeshEntity::~MeshEntity()
 
 void MeshEntity::LoadMeshFromFile(const char * filename)
 {
-	*mesh = MeshLoader::LoadFromFile(filename);
+	if (!MeshLoader::LoadFromFile(filename, mesh, nullptr))
+	{
+		mesh->Clear();
+	}
 }
 
-void MeshEntity::SetMesh(Mesh&& mesh)
-{
-	*(this->mesh) = std::forward<Mesh>(mesh);
-}
+//void MeshEntity::SetMesh(Mesh&& mesh)
+//{
+//	*(this->mesh) = std::forward<Mesh>(mesh);
+//}
 
 RenderTask * MeshEntity::OnRender()
 {
-	if (!Visible() || mesh->GetVerticesData() == nullptr)
+	if (!Visible() || mesh->vertices == nullptr)
 	{
 		return nullptr;
 	}

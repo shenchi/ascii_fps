@@ -1,6 +1,18 @@
 import bpy
+import mathutils
+import struct
 
-def collect_mesh_data(obj, smooth):
+def vector_to_list(v, swap_y_z):
+    order = [0, 2, 1] if swap_y_z else [0, 1, 2]
+    return [v[i] for i in order]
+
+matrix_swap_y_z = mathutils.Matrix()
+matrix_swap_y_z[0][0:4] = 1.0, 0.0, 0.0, 0.0
+matrix_swap_y_z[1][0:4] = 0.0, 0.0, 1.0, 0.0
+matrix_swap_y_z[2][0:4] = 0.0, 1.0, 0.0, 0.0
+matrix_swap_y_z[3][0:4] = 0.0, 0.0, 0.0, 1.0
+
+def collect_mesh_data(obj, smooth, swap_y_z):
     if not 'type' in dir(obj):
         return None
     if obj.type != 'MESH':
@@ -22,15 +34,16 @@ def collect_mesh_data(obj, smooth):
         
     for f in obj.data.polygons:
         for i in range(1, len(f.vertices) - 1):
-            for j in [0, i, i + 1]:
+            vertices_order = [0, i, i + 1] if not swap_y_z else [0, i + 1, i]
+            for j in vertices_order:
                 vert_i = f.vertices[j]
                 loop_i = f.loop_indices[j]
                 v_out = {}
-                v_out['pos'] = obj.data.vertices[vert_i].co
+                v_out['pos'] = vector_to_list(obj.data.vertices[vert_i].co, swap_y_z)
                 if smooth:
-                    v_out['norm'] = obj.data.vertices[vert_i].normal
+                    v_out['norm'] = vector_to_list(obj.data.vertices[vert_i].normal, swap_y_z)
                 else:
-                    v_out['norm'] = f.normal
+                    v_out['norm'] = vector_to_list(f.normal, swap_y_z)
                 if mesh['has_color']:
                     v_out['color'] = color_layer.data[loop_i].color
                 if mesh['has_uv']:
@@ -71,48 +84,92 @@ def collect_mesh_data(obj, smooth):
             scene.frame_set(frame)
             pose = []
             for b in armature.pose.bones:
-                pose.append(b.matrix.copy())
+                pose.append(b.matrix_basis.copy() if not swap_y_z else (matrix_swap_y_z * b.matrix_basis* matrix_swap_y_z))
             action.append([frame, pose])
-        actions.append(action)
+        actions.append([act.frame_range.to_tuple(), action])
         
     return mesh
 
 def write_mesh_data(context, filepath, mesh, normal, color, uv, animation):
     print("running write_mesh_data...")
-    f = open(filepath, 'w', encoding='utf-8')
+    f = open(filepath, 'wb')
+    # magic number
+    f.write(struct.pack('BBBB', 0x4d, 0x45, 0x53, 0x48))
+    # position
+    attrib = 1
+    # normal
+    attrib = attrib | (2 if normal else 0)
+    # color
+    attrib = attrib | (4 if color else 0)
+    # uv
+    output_uv = uv and mesh['has_uv']
+    attrib = attrib | (8 if output_uv else 0)
+    # animation
+    output_anim = animation and 'bones' in mesh
+    attrib = attrib | (16 if output_anim else 0) 
+    f.write(struct.pack('I', attrib))
+    
+    # number of vertex
+    f.write(struct.pack('I', len(mesh['vertices'])))
+    
+    # number of bones
+    f.write(struct.pack('I', 0 if not 'bones' in mesh else len(mesh['bones'])))
+    
+    # number of actions
+    f.write(struct.pack('I', 0 if not 'actions' in mesh else len(mesh['actions'])))
     
     for v in mesh['vertices']:
-        f.write("v %f %f %f" % v['pos'].to_tuple())
+        #f.write("v %f %f %f" % v['pos'].to_tuple())
+        f.write(struct.pack('fff', *(v['pos'])))
         if normal:
-            f.write(" %f %f %f" % v['norm'].to_tuple())
-        if color and mesh['has_color']:
-            f.write(" %f %f %f" % tuple(v['color']))
-        if uv and mesh['has_uv']:
-            f.write(" %f %f" % tuple(v['uv']))
-        if animation and 'bone' in v:
-            for g in v['bone']:
-                f.write(" %d %f" % tuple(g))
-        f.write("\n")
-        
-    f.write("\n")
+            #f.write(" %f %f %f" % v['norm'].to_tuple())
+            f.write(struct.pack('fff', *(v['norm'])))
+        if color:
+            if mesh['has_color']:
+                #f.write(" %f %f %f" % tuple(v['color']))
+                f.write(struct.pack('fff', *(v['color'])))
+            else:
+                f.write(struct.pack('fff', 0.7, 0.7, 0.7))
+        if output_uv:
+            #f.write(" %f %f" % tuple(v['uv']))
+            f.write(struct.pack('ff', *(v['uv'])))
+        if output_anim:
+            n_group = 0 if not 'bone' in v else len(v['bone'])
+            for i in range(0, min(n_group, 4)):
+                # f.write(" %d %f" % tuple(g))
+                f.write(struct.pack('If', *(v['bone'][i])))
+            if n_group < 4:
+                for i in range(n_group, 4):
+                    f.write(struct.pack('If', 0, 0.0))
     
-    if not animation or not 'bones' in mesh:
+    if not output_anim:
         f.close()
         return
     
     for b in mesh['bones']:
-        f.write("b %d\n" % b)
+        #f.write("b %d\n" % b)
+        f.write(struct.pack('i', b))
     
-    f.write("\n")
+    if not 'actions' in mesh:
+        f.close()
+        return
     
     for a in mesh['actions']:
-        f.write("action\n")
-        for frame in a:
-            f.write("frame %d\n" % frame[0])
+        #f.write("action (%f - %f)\n" % a[0])
+        f.write(struct.pack('III', int(a[0][0]), int(a[0][1]), len(a[1])))
+        for frame in a[1]:
+            #f.write("frame %d\n" % frame[0])
+            f.write(struct.pack('I', frame[0]))
             for b in frame[1]:
-                for r in range(0, 4):
-                    f.write('\t%f %f %f %f\n' % b.row[r].to_tuple())
-                f.write('\n')
+                t = b.to_translation()
+                #f.write('\tT %f %f %f\n' % t.to_tuple())
+                f.write(struct.pack('fff', *t))
+                q = b.to_quaternion()
+                #f.write('\tR %f %f %f %f\n' % (q.w, q.x, q.y, q.z))
+                f.write(struct.pack('ffff', *q))
+                s = b.to_scale()
+                #f.write('\tS %f %f %f\n' % s.to_tuple())
+                f.write(struct.pack('fff', *s))
         
     f.close()
     return
@@ -124,6 +181,12 @@ from bpy_extras.io_utils import ExportHelper
 from bpy.props import StringProperty, BoolProperty, EnumProperty
 from bpy.types import Operator
 
+# axis = (('POS_X', "+X", "use +X as export to this axis"),
+#         ('NEG_X', "-X", "use -X as export to this axis"),
+#         ('POS_Y', "+Y", "use +Y as export to this axis"),
+#         ('NEG_Y', "-Y", "use -Y as export to this axis"),
+#         ('POS_Z', "+Z", "use +Z as export to this axis"),
+#         ('NEG_Z', "-Z", "use -Z as export to this axis"))
 
 class ExportMeshFileData(Operator, ExportHelper):
     """This appears in the tooltip of the operator and in the generated docs"""
@@ -141,6 +204,12 @@ class ExportMeshFileData(Operator, ExportHelper):
 
     # List of operator properties, the attributes will be assigned
     # to the class instance from the operator settings before calling.
+    smooth_normal = BoolProperty(
+            name="Smooth Normals",
+            description="Smooth Normals",
+            default=False,
+            )
+
     export_normal = BoolProperty(
             name="Export Normals",
             description="Export Normals",
@@ -150,34 +219,46 @@ class ExportMeshFileData(Operator, ExportHelper):
     export_color = BoolProperty(
             name="Export Colors",
             description="Export Colors",
-            default=False,
+            default=True,
             )
 
     export_uv = BoolProperty(
             name="Export UVs",
             description="Export UVs",
-            default=False,
+            default=True,
             )
 
     export_anim = BoolProperty(
             name="Export Animations",
             description="Export Animations",
-            default=False,
+            default=True,
             )
 
-    #type = EnumProperty(
-    #        name="Example Enum",
-    #        description="Choose between two items",
-    #        items=(('OPT_A', "First Option", "Description one"),
-    #               ('OPT_B', "Second Option", "Description two")),
-    #        default='OPT_A',
-    #        )
+    swap_y_z = BoolProperty(
+            name="Swap Y and Z",
+            description="Swap Y axis and Z axis",
+            default=True,
+            )
+
+    # z_pos = EnumProperty(
+    #         name="+Z",
+    #         description="axis to export",
+    #         items=axis,
+    #         default='POS_Y',
+    #         )
+
+    # y_pos = EnumProperty(
+    #         name="+Y",
+    #         description="axis to export",
+    #         items=axis,
+    #         default='POS_Z',
+    #         )
 
     def execute(self, context):
         scene = bpy.context.scene
         for obj in bpy.data.objects:
             if obj.type == 'MESH':
-                mesh = collect_mesh_data(obj, False)
+                mesh = collect_mesh_data(obj, self.smooth_normal, self.swap_y_z)
                 write_mesh_data(context, self.filepath, mesh, self.export_normal, self.export_color, self.export_uv, self.export_anim)
                 break
         
@@ -186,7 +267,7 @@ class ExportMeshFileData(Operator, ExportHelper):
 
 # Only needed if you want to add into a dynamic menu
 def menu_func_export(self, context):
-    self.layout.operator(ExportMeshFileData.bl_idname, text="Mesh File Export Operator")
+    self.layout.operator(ExportMeshFileData.bl_idname, text="Mesh File (.mesh)")
 
 
 def register():
@@ -200,7 +281,6 @@ def unregister():
 
 
 if __name__ == "__main__":
+    #unregister()
     register()
-
-    # test call
     bpy.ops.export_mesh.mesh_file('INVOKE_DEFAULT')

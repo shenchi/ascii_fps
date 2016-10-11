@@ -46,11 +46,10 @@ int Game::Run()
 	meshEntity->SetParent(playerEntity);
 	meshEntity->SetPosition(0.2f, -0.15f, 0.6f);
 	meshEntity->SetScale(0.2f, 0.2f, 0.2f);
-	//meshEntity->SetPosition(map.GetStartPositionX() + 2.0f, 1.0f, map.GetStartPositionY() + 2.0f);
 
-	MeshEntity* cube = dynamic_cast<MeshEntity*>(engine->CreateEntity("MeshEntity"));
+	/*MeshEntity* cube = dynamic_cast<MeshEntity*>(engine->CreateEntity("MeshEntity"));
 	cube->SetMesh(Mesh::Cube());
-	cube->SetPosition(map.GetStartPositionX() + 6.0f, 1.0f, map.GetStartPositionY() + 6.0f);
+	cube->SetPosition(map.GetStartPositionX() + 6.0f, 1.0f, map.GetStartPositionY() + 6.0f);*/
 
 	return engine->Run();
 }

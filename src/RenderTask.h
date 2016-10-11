@@ -1,7 +1,7 @@
 #pragma once
 
-class Mesh;
-
+struct Mesh;
+//struct 
 struct RenderTask
 {
 	const Mesh*			mesh;

@@ -32,7 +32,7 @@ void Rasterizer::RasterizeTriangle(const float* positions, PixelEmitter* emitter
 	);
 }
 
-void Rasterizer::RasterizeTriangle(int x1, int y1, int x2, int y2, int x3, int y3, PixelEmitter * emitter)
+void Rasterizer::RasterizeTriangle(int x1, int y1, int x2, int y2, int x3, int y3, PixelEmitter* emitter)
 {
 	int dx1_2 = x1 - x2;
 	int dx2_3 = x2 - x3;

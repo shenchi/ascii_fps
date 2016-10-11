@@ -1,9 +1,10 @@
 #pragma once
 
 #include "Mesh.h"
+#include "Animation.h"
 
 class MeshLoader
 {
 public:
-	static Mesh LoadFromFile(const char* filename);
+	static bool LoadFromFile(const char* filename, Mesh* mesh, Animation* anim = nullptr);
 };

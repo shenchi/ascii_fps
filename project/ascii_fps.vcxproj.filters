@@ -26,9 +26,6 @@
     <ClCompile Include="..\src\ObjMeshDumpper.cpp">
       <Filter>Engine\Utils\Debugger</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\Mesh.cpp">
-      <Filter>Engine\Renderer</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\ConsoleWindowAdaptor.cpp">
       <Filter>Engine\Win32</Filter>
     </ClCompile>
@@ -65,7 +62,15 @@
     <ClCompile Include="..\src\MeshLoader.cpp">
       <Filter>Engine\Utils</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\MeshEntity.cpp" />
+    <ClCompile Include="..\src\VertexFormat.cpp">
+      <Filter>Engine\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\MeshEntity.cpp">
+      <Filter>Engine\Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\SkinnedMeshEntity.cpp">
+      <Filter>Engine\Entities</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\Shader.h">
@@ -141,6 +146,18 @@
       <Filter>Engine\Utils</Filter>
     </ClInclude>
     <ClInclude Include="..\src\MeshEntity.h">
+      <Filter>Engine\Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\VertexFormat.h">
+      <Filter>Engine\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\ArrayBuffer.h">
+      <Filter>Engine\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Animation.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\SkinnedMeshEntity.h">
       <Filter>Engine\Entities</Filter>
     </ClInclude>
   </ItemGroup>

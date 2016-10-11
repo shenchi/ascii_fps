@@ -2,7 +2,7 @@
 
 #include "Entity.h"
 
-class Mesh;
+struct Mesh;
 
 class MeshEntity : public Entity
 {
@@ -10,13 +10,13 @@ public:
 	MeshEntity();
 	virtual ~MeshEntity();
 
-	void LoadMeshFromFile(const char* filename);
-	void SetMesh(Mesh&& mesh);
+	virtual void LoadMeshFromFile(const char* filename);
+	//void SetMesh(Mesh&& mesh);
 
 protected:
 	virtual RenderTask*	OnRender();
 
-private:
+protected:
 	Mesh*		mesh;
 	RenderTask*	task;
 };

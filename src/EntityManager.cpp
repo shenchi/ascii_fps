@@ -1,6 +1,7 @@
 #include "EntityManager.h"
 
 #include "MeshEntity.h"
+#include "SkinnedMeshEntity.h"
 
 using namespace std;
 
@@ -8,6 +9,7 @@ EntityManager::EntityManager()
 {
 	// Register built-in entity types
 	Register("MeshEntity", []() { return new MeshEntity(); });
+	Register("SkinnedMeshEntity", []() { return new SkinnedMeshEntity(); });
 }
 
 EntityManager::~EntityManager()

@@ -1,30 +1,27 @@
 #pragma once
 
-class Mesh
+#include "VertexFormat.h"
+#include "ArrayBuffer.h"
+
+struct Mesh
 {
-public:
-	Mesh();
-	Mesh(size_t verticesNum, size_t vertexStride, size_t indicesNum);
-	Mesh(size_t verticesNum, size_t vertexStride, size_t indicesNum, const float* verticesData, const int* indicesData);
-	~Mesh();
-
+	Mesh() = default;
+	~Mesh() = default;
 	Mesh(const Mesh&) = delete;
+	Mesh(Mesh&&) = default;
+
 	Mesh& operator = (const Mesh&) = delete;
+	Mesh& operator = (Mesh&&) = default;
 
-	Mesh(Mesh&&);
-	Mesh& operator = (Mesh&&);
+	inline void Clear()
+	{
+		verticesNum = 0;
+		vertices.release();
+		indices.release();
+	}
 
-	inline const float* GetVerticesData() const { return vertices; }
-	inline size_t GetVerticesNum() const { return verticesNum; }
-
-	inline const int* GetIndicesData() const { return indices; }
-	inline size_t GetIndicesNum() const { return indicesNum; }
-
-	static Mesh Cube();
-
-private:
-	float*		vertices;
-	size_t		verticesNum;
-	int*		indices;
-	size_t		indicesNum;
+	VertexFormat		format;
+	size_t				verticesNum;
+	ArrayBuffer<float>	vertices;
+	ArrayBuffer<int>	indices;
 };

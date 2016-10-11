@@ -3,7 +3,7 @@
 class Rasterizer;
 class Shader;
 class PixelEmitter;
-class Mesh;
+struct Mesh;
 class IColorBufferAdaptor;
 
 class Pipeline

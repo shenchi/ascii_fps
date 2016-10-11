@@ -159,7 +159,6 @@
     <ClCompile Include="..\src\MapEntity.cpp" />
     <ClCompile Include="..\src\MapGenerator.cpp" />
     <ClCompile Include="..\src\MapMesh.cpp" />
-    <ClCompile Include="..\src\Mesh.cpp" />
     <ClCompile Include="..\src\MeshEntity.cpp" />
     <ClCompile Include="..\src\MeshLoader.cpp" />
     <ClCompile Include="..\src\MouseInputReceiver.cpp" />
@@ -169,8 +168,12 @@
     <ClCompile Include="..\src\PlayerEntity.cpp" />
     <ClCompile Include="..\src\Rasterizer.cpp" />
     <ClCompile Include="..\src\Shader.cpp" />
+    <ClCompile Include="..\src\SkinnedMeshEntity.cpp" />
+    <ClCompile Include="..\src\VertexFormat.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\src\Animation.h" />
+    <ClInclude Include="..\src\ArrayBuffer.h" />
     <ClInclude Include="..\src\AsciiGrayScale.h" />
     <ClInclude Include="..\src\Camera.h" />
     <ClInclude Include="..\src\ColorBufferAdaptor.h" />
@@ -195,6 +198,8 @@
     <ClInclude Include="..\src\Rasterizer.h" />
     <ClInclude Include="..\src\RenderTask.h" />
     <ClInclude Include="..\src\Shader.h" />
+    <ClInclude Include="..\src\SkinnedMeshEntity.h" />
+    <ClInclude Include="..\src\VertexFormat.h" />
     <ClInclude Include="..\src\WinAPIDebug.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

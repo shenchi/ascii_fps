@@ -133,7 +133,10 @@ static inline bool IsCW(const float* v1, const float* v2, const float* v3)
 
 int Pipeline::Draw(const float* vertices, size_t numVertices, const int* indices, size_t numIndices)
 {
-	if (numIndices % 3 != 0)
+	bool withIndices = (numIndices != 0);
+	size_t vertexCount = withIndices ? numIndices : numVertices;
+
+	if (vertexCount % 3 != 0)
 	{
 		return -1;
 	}
@@ -146,11 +149,11 @@ int Pipeline::Draw(const float* vertices, size_t numVertices, const int* indices
 
 	float screenPositions[6] = {};
 
-	for (size_t i = 0; i < numIndices; i += 3)
+	for (size_t i = 0; i < vertexCount; i += 3)
 	{
-		const float* v1_in = vertices + vertexDataStride * indices[i];
-		const float* v2_in = vertices + vertexDataStride * indices[i + 1];
-		const float* v3_in = vertices + vertexDataStride * indices[i + 2];
+		const float* v1_in = vertices + vertexDataStride * (withIndices ? indices[i] : i);
+		const float* v2_in = vertices + vertexDataStride * (withIndices ? indices[i + 1] : (i + 1));
+		const float* v3_in = vertices + vertexDataStride * (withIndices ? indices[i + 2] : (i + 2));
 
 		vertexShader->Main(v1_in, v1_out);
 		vertexShader->Main(v2_in, v2_out);
@@ -198,7 +201,7 @@ int Pipeline::Draw(const float* vertices, size_t numVertices, const int* indices
 
 int Pipeline::Draw(const Mesh * mesh)
 {
-	return Draw(mesh->GetVerticesData(), mesh->GetVerticesNum(), mesh->GetIndicesData(), mesh->GetIndicesNum());
+	return Draw(mesh->vertices, mesh->verticesNum, mesh->indices, mesh->indices.size());
 }
 
 bool Pipeline::ZTest(int x, int y, float z)
