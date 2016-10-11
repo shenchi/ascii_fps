@@ -11,12 +11,16 @@ public:
 	SkinnedMeshEntity();
 	virtual ~SkinnedMeshEntity();
 
-	virtual void LoadMeshFromFile(const char* filename);
+	virtual void	LoadMeshFromFile(const char* filename);
 
-	void SetAction(size_t action);
-	void SetFrame(int frame);
+	bool			SetAction(size_t action);
+	bool			SetFrame(int frame);
 
-	virtual void OnUpdate(float delta_time);
+	virtual void	OnUpdate(float delta_time);
+
+protected:
+	bool			AdvanceFrame();
+	void			UpdatePose();
 
 protected:
 	Animation*	anim;
@@ -24,5 +28,9 @@ protected:
 	int			currentAction;
 	int			startFrame;
 	int			endFrame;
+	int			currentSection;
+	int			sectionStart;
+	int			sectionEnd;
 	int			currentFrame;
+	bool		loop;
 };
