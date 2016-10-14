@@ -2,20 +2,22 @@
 
 #include "Light.h"
 
-#include <vector>
-#include <algorithm>
+#include "ArrayBuffer.h"
 
 class LightManager
 {
 public:
 
-	inline Light* CreateLight() {
-		lights.push_back(Light());
-		return &lights[lights.size() - 1];
-	}
-
-	inline void	RemoveLights() {
-		lights.erase(std::remove_if(lights.begin(), lights.end(), [](const Light& l) { return l.remove == 1; }), lights.end());
+	inline Light* GetFreeLight() {
+		for (size_t i = 0; i < MaxLightCount; ++i)
+		{
+			if (!lights[i].inUse)
+			{
+				lights[i].inUse = true;
+				return &lights[i];
+			}
+		}
+		return nullptr;
 	}
 
 	inline size_t Count() const { return lights.size(); }
@@ -28,5 +30,5 @@ public:
 	}
 
 private:
-	std::vector<Light>	lights;
+	ArrayBuffer<Light>	lights = ArrayBuffer<Light>(MaxLightCount);
 };

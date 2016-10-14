@@ -265,6 +265,6 @@ Light * Engine::CreateLight()
 {
 	if (nullptr == lights)
 		return nullptr;
-	return lights->CreateLight();
+	return lights->GetFreeLight();
 }
 
