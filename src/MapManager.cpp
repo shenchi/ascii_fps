@@ -3,6 +3,7 @@
 #include "Engine.h"
 #include "DungeonMap.h"
 #include "MapEntity.h"
+#include "MeshEntity.h"
 
 MapManager* MapManager::_instance = nullptr;
 
@@ -15,6 +16,10 @@ void MapManager::CreateMap()
 	map->Create();
 	mapEntity = dynamic_cast<MapEntity*>(Engine::instance()->CreateEntity("MapEntity"));
 	mapEntity->SetMesh(map->GetMesh());
+
+	ladderEntity = dynamic_cast<MeshEntity*>(Engine::instance()->CreateEntity("MeshEntity"));
+	ladderEntity->LoadMeshFromFile("../assets/ladder.mesh");
+	ladderEntity->SetPosition(map->GetEndPositionX(), 0, map->GetEndPositionY());
 }
 
 void MapManager::DestroyMap()
@@ -24,6 +29,7 @@ void MapManager::DestroyMap()
 
 	delete map;
 	mapEntity->Destroy();
+	ladderEntity->Destroy();
 }
 
 float MapManager::GetStartPositionX() const
@@ -43,4 +49,9 @@ float MapManager::GetStartPositionY() const
 bool MapManager::CollideWithMap(float & x, float & y, float radius) const
 {
 	return map->MoveInMap(x, y, radius);
+}
+
+bool MapManager::IsInExit(float x, float y) const
+{
+	return map->IsInExit(x, y);
 }

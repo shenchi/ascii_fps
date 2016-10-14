@@ -1,7 +1,7 @@
 #include "FireballEntity.h"
 
 #include "RenderTask.h"
-#include "Shader.h"
+#include "BuiltInShaders.h"
 
 #include "MapManager.h"
 

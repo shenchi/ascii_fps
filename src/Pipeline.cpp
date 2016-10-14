@@ -77,7 +77,7 @@ void Pipeline::SetVertexShader(Shader * shader)
 {
 	if (nullptr == shader)
 	{
-		shader = BuiltInShaders::DefaultVertexShader();
+		return;
 	}
 	vertexShader = shader;
 	vertexDataStride = vertexShader->Stride();
@@ -87,7 +87,7 @@ void Pipeline::SetPixelShader(Shader * shader)
 {
 	if (nullptr == shader)
 	{
-		shader = BuiltInShaders::DefaultPixelShader();
+		return;
 	}
 	pixelShader = shader;
 	pixelDataStride = pixelShader->Stride();

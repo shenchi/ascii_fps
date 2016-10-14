@@ -4,9 +4,10 @@
 #include "ConsoleWindowPrinter.h"
 #include "Rasterizer.h"
 #include "Pipeline.h"
-#include "Shader.h"
+#include "BuiltInShaders.h"
 #include "EntityManager.h"
 #include "ResourceManager.h"
+#include "LightManager.h"
 #include "Camera.h"
 #include "RenderTask.h"
 #include "Animation.h"
@@ -31,7 +32,8 @@ Engine::Engine()
 	pipeline(nullptr),
 	entities(nullptr),
 	camera(nullptr),
-	resources(nullptr)
+	resources(nullptr),
+	lights(nullptr)
 {
 	assert(_instance == nullptr);
 	_instance = this;
@@ -39,6 +41,7 @@ Engine::Engine()
 
 Engine::~Engine()
 {
+	if (nullptr != lights) delete lights;
 	if (nullptr != resources) delete resources;
 	if (nullptr != camera) delete camera;
 	if (nullptr != entities) delete entities;
@@ -66,8 +69,8 @@ int Engine::Initialize()
 	pipeline = new Pipeline(raster, adaptor);
 
 	entities = new EntityManager();
-
 	resources = new ResourceManager();
+	lights = new LightManager();
 
 	camera = new Camera();
 	camera->SetPerspectiveProjection(45.0f, 0.5f * adaptor->GetBufferWidth() / adaptor->GetBufferHeight(), 0.5f, 80.0f);
@@ -136,6 +139,8 @@ int Engine::Run()
 			(*entity)->OnUpdate(deltaTime);
 		}
 
+		lights->RemoveLights();
+
 		// Update all position informations
 		for (auto entity = entities->Begin(); entity != entities->End(); ++entity)
 		{
@@ -173,10 +178,11 @@ int Engine::Run()
 			pipeline->SetPixelShader(BuiltInShaders::GetPixelShader((*task)->pixelShader));
 
 			pipeline->SetConstantBuffer(0, reinterpret_cast<float*>(builtInMatrix));
+			pipeline->SetConstantBuffer(1, reinterpret_cast<float*>(lights));
 
 			if ((*task)->pose != nullptr) 
 			{
-				pipeline->SetConstantBuffer(1, (*task)->pose->matrices);
+				pipeline->SetConstantBuffer(2, (*task)->pose->matrices);
 			}
 
 			pipeline->Draw((*task)->mesh);
@@ -253,5 +259,12 @@ Mesh * Engine::LoadMesh(const char * filename)
 Animation * Engine::LoadAnimation(const char * filename)
 {
 	return resources->LoadAnimation(filename);
+}
+
+Light * Engine::CreateLight()
+{
+	if (nullptr == lights)
+		return nullptr;
+	return lights->CreateLight();
 }
 

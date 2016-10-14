@@ -83,6 +83,9 @@
     <ClCompile Include="..\src\ConsoleWindowPrinter.cpp">
       <Filter>Engine\Win32</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\BuiltInShaders.cpp">
+      <Filter>Engine</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\Shader.h">
@@ -189,6 +192,15 @@
     </ClInclude>
     <ClInclude Include="..\src\Creature.h">
       <Filter>Gameplay</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Light.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\LightManager.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\BuiltInShaders.h">
+      <Filter>Engine</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

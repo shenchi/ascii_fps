@@ -4,7 +4,7 @@
 #include "RenderTask.h"
 
 #include "Animation.h"
-#include "Shader.h"
+#include "BuiltInShaders.h"
 
 #include <glm/glm.hpp>
 #include <glm/gtx/transform.hpp>

@@ -9,9 +9,11 @@ class Rasterizer;
 class Pipeline;
 class EntityManager;
 class ResourceManager;
+class LightManager;
 
 struct Mesh;
 struct Animation;
+struct Light;
 
 class Engine
 {
@@ -42,6 +44,8 @@ public:
 	Mesh*					LoadMesh(const char* filename);
 	Animation*				LoadAnimation(const char* filename);
 
+	Light*					CreateLight();
+
 private:
 	bool					running;
 
@@ -53,6 +57,7 @@ private:
 	Camera*					camera;
 	EntityManager*			entities;
 	ResourceManager*		resources;
+	LightManager*			lights;
 
 private:
 	static Engine* _instance;

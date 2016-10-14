@@ -1,6 +1,7 @@
 #pragma once
 
 class DungeonMap;
+class MeshEntity;
 class MapEntity;
 
 class MapManager
@@ -22,6 +23,7 @@ public:
 	float	GetStartPositionX() const;
 	float	GetStartPositionY() const;
 	bool	CollideWithMap(float& x, float& y, float radius) const;
+	bool	IsInExit(float x, float y) const;
 
 private:
 	MapManager() = default;
@@ -29,6 +31,7 @@ private:
 private:
 	DungeonMap*			map;
 	MapEntity*			mapEntity;
+	MeshEntity*			ladderEntity;
 
 private:
 	static MapManager*	_instance;

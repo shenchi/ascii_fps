@@ -64,17 +64,26 @@ void MapGenerator::GenEntryAndExit()
 
 	auto last = cells.end();
 	auto first = cells.end();
+	float maxDist = 0.0f;
 
-	for (auto i = cells.begin(); i != cells.end(); ++i)
+	for (auto i = cells.begin(); i != cells.end() - 1; ++i)
 	{
-		if (i->room)
-		{
-			if (first == cells.end())
-			{
-				first = i;
-			}
+		if (!i->room)
+			continue;
 
-			last = i;
+		for (auto j = i + 1; j != cells.end(); ++j)
+		{
+			if (!j->room)
+				continue;
+
+			float deltaX = j->cx() - i->cx();
+			float deltaY = j->cy() - i->cy();
+			float dist = sqrt(deltaX * deltaX + deltaY * deltaY);
+			if (dist > maxDist) {
+				maxDist = dist;
+				first = i;
+				last = j;
+			}
 		}
 	}
 

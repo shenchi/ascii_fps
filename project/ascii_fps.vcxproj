@@ -147,6 +147,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\src\AsciiGrayScale.cpp" />
+    <ClCompile Include="..\src\BuiltInShaders.cpp" />
     <ClCompile Include="..\src\Camera.cpp" />
     <ClCompile Include="..\src\ConsoleWindow.cpp" />
     <ClCompile Include="..\src\ConsoleWindowAdaptor.cpp" />
@@ -179,6 +180,7 @@
     <ClInclude Include="..\src\Animation.h" />
     <ClInclude Include="..\src\ArrayBuffer.h" />
     <ClInclude Include="..\src\AsciiGrayScale.h" />
+    <ClInclude Include="..\src\BuiltInShaders.h" />
     <ClInclude Include="..\src\Camera.h" />
     <ClInclude Include="..\src\ColorBufferAdaptor.h" />
     <ClInclude Include="..\src\ConsoleWindow.h" />
@@ -192,6 +194,8 @@
     <ClInclude Include="..\src\FireballEntity.h" />
     <ClInclude Include="..\src\font.h" />
     <ClInclude Include="..\src\Game.h" />
+    <ClInclude Include="..\src\Light.h" />
+    <ClInclude Include="..\src\LightManager.h" />
     <ClInclude Include="..\src\MapEntity.h" />
     <ClInclude Include="..\src\MapGenerator.h" />
     <ClInclude Include="..\src\MapManager.h" />

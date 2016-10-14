@@ -110,6 +110,24 @@ float DungeonMap::GetStartPositionY() const
 	return gridSize * (mapGen->EntryY() - mapGen->Top() + 0.5f);
 }
 
+float DungeonMap::GetEndPositionX() const
+{
+	if (nullptr == mapData)
+	{
+		return 0.0f;
+	}
+	return gridSize * (mapGen->ExitX() - mapGen->Left() + 0.5f);
+}
+
+float DungeonMap::GetEndPositionY() const
+{
+	if (nullptr == mapData)
+	{
+		return 0.0f;
+	}
+	return gridSize * (mapGen->ExitY() - mapGen->Top() + 0.5f);
+}
+
 bool DungeonMap::MoveInMap(float& destX, float& destY, float radius) const
 {
 	if (nullptr == mapData)
@@ -139,4 +157,16 @@ bool DungeonMap::MoveInMap(float& destX, float& destY, float radius) const
 #undef TEST
 
 	return collided;
+}
+
+bool DungeonMap::IsInExit(float x, float y) const
+{
+	int dx = int(x / gridSize);
+	int dy = int(y / gridSize);
+	if (dx == (mapGen->ExitX() - mapGen->Left()) &&
+		dy == (mapGen->ExitY() - mapGen->Top()))
+	{
+		return true;
+	}
+	return false;
 }
