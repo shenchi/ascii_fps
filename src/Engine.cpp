@@ -73,7 +73,7 @@ int Engine::Initialize()
 	lights = new LightManager();
 
 	camera = new Camera();
-	camera->SetPerspectiveProjection(45.0f, 0.5f * adaptor->GetBufferWidth() / adaptor->GetBufferHeight(), 0.5f, 80.0f);
+	camera->SetPerspectiveProjection(45.0f, 0.5f * adaptor->GetBufferWidth() / adaptor->GetBufferHeight(), 0.5f, 20.0f);
 
 	return ret;
 }
@@ -138,8 +138,6 @@ int Engine::Run()
 		{
 			(*entity)->OnUpdate(deltaTime);
 		}
-
-		lights->RemoveLights();
 
 		// Update all position informations
 		for (auto entity = entities->Begin(); entity != entities->End(); ++entity)

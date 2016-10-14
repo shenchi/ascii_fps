@@ -86,6 +86,15 @@
     <ClCompile Include="..\src\BuiltInShaders.cpp">
       <Filter>Engine</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\CreaturesData.cpp">
+      <Filter>Gameplay</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\SlimeEntity.cpp">
+      <Filter>Gameplay</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\CreatureManager.cpp">
+      <Filter>Gameplay</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\Shader.h">
@@ -201,6 +210,15 @@
     </ClInclude>
     <ClInclude Include="..\src\BuiltInShaders.h">
       <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\CreaturesData.h">
+      <Filter>Gameplay</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\SlimeEntity.h">
+      <Filter>Gameplay</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\CreatureManager.h">
+      <Filter>Gameplay</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

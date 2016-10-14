@@ -5,10 +5,16 @@
 #include "SkinnedMeshEntity.h"
 #include "MapManager.h"
 
+#include "CreaturesData.h"
+#include "CreatureManager.h"
+
 // for registration
 #include "MapEntity.h"
 #include "PlayerEntity.h"
 #include "FireballEntity.h"
+#include "SlimeEntity.h"
+
+#include <ctime>
 
 Game::Game()
 	:engine(new Engine())
@@ -29,24 +35,22 @@ int Game::Run()
 	entityMgr->Register("MapEntity", []() { return new MapEntity(); });
 	entityMgr->Register("PlayerEntity", []() { return new PlayerEntity(); });
 	entityMgr->Register("FireballEntity", []() { return new FireballEntity(); });
+	entityMgr->Register("SlimeEntity", []() { return new SlimeEntity(); });
+
+	CreaturesData::instance()->Init("../assets/creatures.tsv");
+
+	CreatureManager::instance()->SetSeed((unsigned int)std::time(NULL));
+	CreatureManager::instance()->SetMaxEnemyCount(10);
 
 	MapManager::instance()->CreateMap();
 	
 	PlayerEntity* playerEntity = dynamic_cast<PlayerEntity*>(engine->CreateEntity("PlayerEntity"));
 	playerEntity->SetPosition(MapManager::instance()->GetStartPositionX(), 1.0f, MapManager::instance()->GetStartPositionY());
 
-	MeshEntity* meshEntity = dynamic_cast<MeshEntity*>(engine->CreateEntity("MeshEntity"));
-	meshEntity->LoadMeshFromFile("../assets/sword.mesh");
-	meshEntity->SetParent(playerEntity);
-	meshEntity->SetPosition(0.2f, -0.15f, 0.6f);
-	meshEntity->SetScale(0.2f, 0.2f, 0.2f);
-
-	SkinnedMeshEntity* slime = dynamic_cast<SkinnedMeshEntity*>(engine->CreateEntity("SkinnedMeshEntity"));
-	slime->LoadMeshFromFile("../assets/slime.mesh");
-	slime->SetScale(0.5f, 0.5f, 0.5f);
-	slime->SetPosition(MapManager::instance()->GetStartPositionX(), 0.0f, MapManager::instance()->GetStartPositionY() + 5.0f);
-	slime->SetLoop(true);
-	slime->Play();
+	CreatureManager::instance()->SetPlayerEntity(playerEntity);
+	CreatureManager::instance()->SetSpawnRadius(20.0f, 40.0f);
+	CreatureManager::instance()->SpawnToMaxCount();
+	CreatureManager::instance()->SetSpawnRadius(10.0f, 40.0f);
 
 	return engine->Run();
 }

@@ -24,6 +24,7 @@ public:
 	float	GetStartPositionY() const;
 	bool	CollideWithMap(float& x, float& y, float radius) const;
 	bool	IsInExit(float x, float y) const;
+	bool	IsWalkable(float x, float y) const;
 
 private:
 	MapManager() = default;

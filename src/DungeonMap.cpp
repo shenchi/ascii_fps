@@ -170,3 +170,12 @@ bool DungeonMap::IsInExit(float x, float y) const
 	}
 	return false;
 }
+
+bool DungeonMap::IsWalkable(float x, float y) const
+{
+	int dx = int(x / gridSize);
+	int dy = int(y / gridSize);
+	if (dx < 0 || dx >= mapWidth || dy < 0 || dy >= mapHeight)
+		return false;
+	return (mapData[dy * mapWidth + dx] == '.');
+}

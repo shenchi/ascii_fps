@@ -55,3 +55,8 @@ bool MapManager::IsInExit(float x, float y) const
 {
 	return map->IsInExit(x, y);
 }
+
+bool MapManager::IsWalkable(float x, float y) const
+{
+	return map->IsWalkable(x, y);
+}

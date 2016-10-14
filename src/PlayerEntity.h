@@ -6,7 +6,7 @@
 
 class Camera;
 
-class PlayerEntity : public Entity, Creature
+class PlayerEntity : public Entity, public Creature
 {
 public:
 	virtual void OnCreate();

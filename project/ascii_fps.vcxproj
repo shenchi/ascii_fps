@@ -152,7 +152,9 @@
     <ClCompile Include="..\src\ConsoleWindow.cpp" />
     <ClCompile Include="..\src\ConsoleWindowAdaptor.cpp" />
     <ClCompile Include="..\src\ConsoleWindowPrinter.cpp" />
+    <ClCompile Include="..\src\CreaturesData.cpp" />
     <ClCompile Include="..\src\DungeonMap.cpp" />
+    <ClCompile Include="..\src\CreatureManager.cpp" />
     <ClCompile Include="..\src\Engine.cpp" />
     <ClCompile Include="..\src\Entity.cpp" />
     <ClCompile Include="..\src\EntityManager.cpp" />
@@ -174,6 +176,7 @@
     <ClCompile Include="..\src\ResourceManager.cpp" />
     <ClCompile Include="..\src\Shader.cpp" />
     <ClCompile Include="..\src\SkinnedMeshEntity.cpp" />
+    <ClCompile Include="..\src\SlimeEntity.cpp" />
     <ClCompile Include="..\src\VertexFormat.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -187,7 +190,9 @@
     <ClInclude Include="..\src\ConsoleWindowAdaptor.h" />
     <ClInclude Include="..\src\ConsoleWindowPrinter.h" />
     <ClInclude Include="..\src\Creature.h" />
+    <ClInclude Include="..\src\CreaturesData.h" />
     <ClInclude Include="..\src\DungeonMap.h" />
+    <ClInclude Include="..\src\CreatureManager.h" />
     <ClInclude Include="..\src\Engine.h" />
     <ClInclude Include="..\src\Entity.h" />
     <ClInclude Include="..\src\EntityManager.h" />
@@ -213,6 +218,7 @@
     <ClInclude Include="..\src\ResourceManager.h" />
     <ClInclude Include="..\src\Shader.h" />
     <ClInclude Include="..\src\SkinnedMeshEntity.h" />
+    <ClInclude Include="..\src\SlimeEntity.h" />
     <ClInclude Include="..\src\VertexFormat.h" />
     <ClInclude Include="..\src\WinAPIDebug.h" />
   </ItemGroup>
