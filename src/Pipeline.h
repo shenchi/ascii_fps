@@ -20,7 +20,7 @@ public:
 	void SetVertexShader(Shader* shader);
 	void SetPixelShader(Shader* shader);
 
-	void SetConstantBuffer(const float* buffer);
+	void SetConstantBuffer(size_t index, const float* buffer);
 
 	int Draw(const float* vertices, size_t numVertices, const int* indices, size_t numIndices);
 	int Draw(const Mesh* mesh);

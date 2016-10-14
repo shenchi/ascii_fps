@@ -5,7 +5,7 @@
 struct Bone
 {
 	float x, y, z;			// translation
-	float qw, qx, qy, qz;	// rotation
+	float qx, qy, qz, qw;	// rotation
 	float sx, sy, sz;		// scale
 };
 #pragma pack(pop)

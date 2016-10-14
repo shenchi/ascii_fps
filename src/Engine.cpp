@@ -3,9 +3,11 @@
 #include "ConsoleWindowAdaptor.h"
 #include "Rasterizer.h"
 #include "Pipeline.h"
+#include "Shader.h"
 #include "EntityManager.h"
 #include "Camera.h"
 #include "RenderTask.h"
+#include "Animation.h"
 #include <chrono>
 #include <vector>
 #include <glm/glm.hpp>
@@ -143,7 +145,17 @@ int Engine::Run()
 		{
 			matWorld = (*reinterpret_cast<const glm::mat4*>((*task)->worldMatrix));
 			matMVP = matVP * matWorld;
-			pipeline->SetConstantBuffer(reinterpret_cast<float*>(builtInMatrix));
+			if ((*task)->pose != nullptr) 
+			{
+				pipeline->SetVertexShader(BuiltInShaders::DefaultSkinnedMeshVertexShader());
+				pipeline->SetConstantBuffer(0, reinterpret_cast<float*>(builtInMatrix));
+				pipeline->SetConstantBuffer(1, (*task)->pose->matrices);
+			}
+			else
+			{
+				pipeline->SetVertexShader(BuiltInShaders::DefaultVertexShader());
+				pipeline->SetConstantBuffer(0, reinterpret_cast<float*>(builtInMatrix));
+			}
 			pipeline->Draw((*task)->mesh);
 		}
 

@@ -10,6 +10,7 @@
 #include "PlayerEntity.h"
 #include "Mesh.h"
 #include "MeshEntity.h"
+#include "SkinnedMeshEntity.h"
 
 Game::Game()
 	:engine(new Engine())
@@ -47,9 +48,12 @@ int Game::Run()
 	meshEntity->SetPosition(0.2f, -0.15f, 0.6f);
 	meshEntity->SetScale(0.2f, 0.2f, 0.2f);
 
-	/*MeshEntity* cube = dynamic_cast<MeshEntity*>(engine->CreateEntity("MeshEntity"));
-	cube->SetMesh(Mesh::Cube());
-	cube->SetPosition(map.GetStartPositionX() + 6.0f, 1.0f, map.GetStartPositionY() + 6.0f);*/
+	SkinnedMeshEntity* slime = dynamic_cast<SkinnedMeshEntity*>(engine->CreateEntity("SkinnedMeshEntity"));
+	slime->LoadMeshFromFile("../assets/slime.mesh");
+	slime->SetScale(0.5f, 0.5f, 0.5f);
+	slime->SetPosition(map.GetStartPositionX(), 0.0f, map.GetStartPositionY() + 5.0f);
+	slime->SetLoop(true);
+	slime->Play();
 
 	return engine->Run();
 }

@@ -33,14 +33,6 @@ namespace
 	private:
 		FILE* fp;
 	};
-
-
-	void LoadMeshDataFromFile(Mesh& mesh, FILE* fp)
-	{
-		
-
-
-	}
 }
 
 bool MeshLoader::LoadFromFile(const char* filename, Mesh* mesh, Animation* anim)

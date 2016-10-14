@@ -114,10 +114,10 @@ void Pipeline::SetPixelShader(Shader * shader)
 	interpolateDataBlock = new float[pixelDataStride];
 }
 
-void Pipeline::SetConstantBuffer(const float * buffer)
+void Pipeline::SetConstantBuffer(size_t index, const float * buffer)
 {
-	vertexShader->SetConstantBuffer(buffer);
-	pixelShader->SetConstantBuffer(buffer);
+	vertexShader->SetConstantBuffer(index, buffer);
+	pixelShader->SetConstantBuffer(index, buffer);
 }
 
 static inline bool IsCW(const float* v1, const float* v2, const float* v3)

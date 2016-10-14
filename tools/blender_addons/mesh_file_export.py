@@ -6,10 +6,16 @@ def vector_to_list(v, swap_y_z):
     order = [0, 2, 1] if swap_y_z else [0, 1, 2]
     return [v[i] for i in order]
 
+def reorder_trans(t):
+    return [t[0], t[1], t[2]]
+
+def reorder_quat(q):
+    return [q[1], q[2], q[3], q[0]]
+
 matrix_swap_y_z = mathutils.Matrix()
 matrix_swap_y_z[0][0:4] = 1.0, 0.0, 0.0, 0.0
-matrix_swap_y_z[1][0:4] = 0.0, 0.0, 1.0, 0.0
-matrix_swap_y_z[2][0:4] = 0.0, 1.0, 0.0, 0.0
+matrix_swap_y_z[1][0:4] = 0.0, 1.0, 0.0, 0.0
+matrix_swap_y_z[2][0:4] = 0.0, 0.0, -1.0, 0.0
 matrix_swap_y_z[3][0:4] = 0.0, 0.0, 0.0, 1.0
 
 def collect_mesh_data(obj, smooth, swap_y_z):
@@ -85,6 +91,7 @@ def collect_mesh_data(obj, smooth, swap_y_z):
             pose = []
             for b in armature.pose.bones:
                 pose.append(b.matrix_basis.copy() if not swap_y_z else (matrix_swap_y_z * b.matrix_basis* matrix_swap_y_z))
+                #pose.append(b.matrix_basis.copy())
             action.append([frame, pose])
         actions.append([act.frame_range.to_tuple(), action])
         
@@ -163,10 +170,10 @@ def write_mesh_data(context, filepath, mesh, normal, color, uv, animation):
             for b in frame[1]:
                 t = b.to_translation()
                 #f.write('\tT %f %f %f\n' % t.to_tuple())
-                f.write(struct.pack('fff', *t))
+                f.write(struct.pack('fff', *reorder_trans(t)))
                 q = b.to_quaternion()
                 #f.write('\tR %f %f %f %f\n' % (q.w, q.x, q.y, q.z))
-                f.write(struct.pack('ffff', *q))
+                f.write(struct.pack('ffff', *reorder_quat(q)))
                 s = b.to_scale()
                 #f.write('\tS %f %f %f\n' % s.to_tuple())
                 f.write(struct.pack('fff', *s))
