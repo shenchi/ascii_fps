@@ -2,6 +2,8 @@
 
 #include "Shader.h"
 
+#include "Light.h"
+
 #include <cassert>
 #include <glm/glm.hpp>
 
@@ -134,6 +136,8 @@ namespace
 	};
 	DefaultSkinnedMeshVertexShader defaultVertexSkinnedMeshShader;
 
+	/*
+	*/
 	class UnlitVertexShader : public VertexShader
 	{
 	public:
@@ -179,6 +183,56 @@ namespace
 
 	/*
 	*/
+	class PixelLightingVertexShader : public VertexShader
+	{
+	public:
+		PixelLightingVertexShader()
+			:
+			VertexShader(VertexPosition | VertexNormal | VertexColor),
+			matMVP(nullptr),
+			matWorld(nullptr),
+			matView(nullptr),
+			matProj(nullptr)
+		{}
+
+		virtual void Main(const float* in, float* out) const
+		{
+			const vec3& pos = reinterpret_cast<const vec3&>(*in);
+			const vec3& norm = reinterpret_cast<const vec3&>(*(in + 3));
+			const vec3& col = reinterpret_cast<const vec3&>(*(in + 6));
+
+			vec4& pos_out = reinterpret_cast<vec4&>(*out);
+			vec4& col_out = reinterpret_cast<vec4&>(*(out + 4));
+			vec4& world_position = reinterpret_cast<vec4&>(*(out + 8));
+			vec4& world_normal = reinterpret_cast<vec4&>(*(out + 12));
+
+			world_position = (*matWorld) * vec4(pos, 1.0f);
+			world_normal = (*matWorld) * vec4(norm, 1.0f);
+
+			pos_out = (*matMVP) * vec4(pos, 1.0f);
+			col_out = vec4(col, 1.0);
+		}
+
+		virtual void SetConstantBuffer(size_t index, const float* buffer)
+		{
+			if (index == 0)
+			{
+				matMVP = reinterpret_cast<const mat4*>(buffer);
+				matWorld = reinterpret_cast<const mat4*>(buffer + 16);
+				matView = reinterpret_cast<const mat4*>(buffer + 32);
+				matProj = reinterpret_cast<const mat4*>(buffer + 48);
+			}
+		}
+	private:
+		const mat4* matMVP;
+		const mat4* matWorld;
+		const mat4* matView;
+		const mat4* matProj;
+	};
+	PixelLightingVertexShader pixelLightingVertexShader;
+
+	/*
+	*/
 	class DefaultPixelShader : public Shader
 	{
 	public:
@@ -198,12 +252,46 @@ namespace
 	};
 	DefaultPixelShader defaultPixelShader;
 
+	/*
+	*/
+	class PixelLightingPixelShader : public Shader
+	{
+	public:
+		virtual void Main(const float* in, float* out) const
+		{
+			const vec4& col = reinterpret_cast<const vec4&>(*(in + 4));
+			const vec4& pos = reinterpret_cast<const vec4&>(*(in + 8));
+			const vec4& norm = reinterpret_cast<const vec4&>(*(in + 12));
+
+			vec4& col_out = reinterpret_cast<vec4&>(*out);
+
+			// TODO
+			// count of light? we need set a fixed max count
+
+			col_out = col;
+		}
+
+		virtual size_t Stride() const { return 16; }
+
+		virtual void SetConstantBuffer(size_t index, const float* buffer)
+		{
+			if (index == 1)
+			{
+				lights = reinterpret_cast<const Light*>(buffer);
+			}
+		}
+	private:
+		const Light* lights = nullptr;
+	};
+	PixelLightingPixelShader pixelLightingPixelShader;
+
 
 	Shader* vertexShaderArray[] =
 	{
 		&defaultVertexShader,
 		&defaultVertexSkinnedMeshShader,
 		&unlitVertexShader,
+		&pixelLightingVertexShader,
 	};
 
 	size_t registeredVertexShaderCount = sizeof(vertexShaderArray) / sizeof(vertexShaderArray[0]);
@@ -211,6 +299,7 @@ namespace
 	Shader* pixelShaderArray[] =
 	{
 		&defaultPixelShader,
+		&pixelLightingPixelShader,
 	};
 
 	size_t registeredPixelShaderCount = sizeof(pixelShaderArray) / sizeof(pixelShaderArray[0]);

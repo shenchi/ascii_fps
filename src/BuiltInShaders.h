@@ -11,13 +11,13 @@ public:
 		vsDefault = 0,
 		vsSkinnedMesh,
 		vsUnlit,
-		//vsPixelLighting,
+		vsPixelLighting,
 	};
 
 	enum PixelShaderIndex
 	{
 		psDefault = 0,
-		//psPixelLighting,
+		psPixelLighting,
 	};
 
 	static Shader*	DefaultVertexShader();
