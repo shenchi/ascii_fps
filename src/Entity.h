@@ -20,6 +20,7 @@ public:
 
 	virtual void		OnCreate();
 	virtual void		OnUpdate(float deltaTime);
+	virtual void		OnOverlay();
 	virtual void		OnDestroy();
 
 	void				SetPosition(float x, float y, float z);

@@ -80,6 +80,9 @@
     <ClCompile Include="..\src\ResourceManager.cpp">
       <Filter>Engine</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\ConsoleWindowPrinter.cpp">
+      <Filter>Engine\Win32</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\Shader.h">
@@ -177,6 +180,15 @@
     </ClInclude>
     <ClInclude Include="..\src\ResourceManager.h">
       <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\ConsoleWindowPrinter.h">
+      <Filter>Engine\Win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\font.h">
+      <Filter>Engine\Win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Creature.h">
+      <Filter>Gameplay</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

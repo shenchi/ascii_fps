@@ -5,6 +5,7 @@
 #include "FireballEntity.h"
 
 #include <Windows.h>
+#include <cstdio>
 #include <glm/glm.hpp>
 #include <glm/gtx/transform.hpp>
 #include <cmath>
@@ -91,5 +92,12 @@ void PlayerEntity::OnUpdate(float deltaTime)
 	{
 		engine->Quit();
 	}
+}
+
+void PlayerEntity::OnOverlay()
+{
+	char buf[16];
+	sprintf(buf, "HP%d", HP);
+	Engine::instance()->PrintText(2, -8, buf, 12);
 }
 

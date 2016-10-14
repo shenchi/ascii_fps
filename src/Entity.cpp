@@ -33,6 +33,10 @@ void Entity::OnUpdate(float deltaTime)
 {
 }
 
+void Entity::OnOverlay()
+{
+}
+
 void Entity::OnDestroy()
 {
 }

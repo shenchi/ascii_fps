@@ -1,6 +1,7 @@
 #include "Engine.h"
 #include "ConsoleWindow.h"
 #include "ConsoleWindowAdaptor.h"
+#include "ConsoleWindowPrinter.h"
 #include "Rasterizer.h"
 #include "Pipeline.h"
 #include "Shader.h"
@@ -24,6 +25,7 @@ Engine::Engine()
 	:
 	running(false),
 	window(nullptr),
+	printer(nullptr),
 	adaptor(nullptr),
 	raster(nullptr),
 	pipeline(nullptr),
@@ -37,11 +39,13 @@ Engine::Engine()
 
 Engine::~Engine()
 {
+	if (nullptr != resources) delete resources;
 	if (nullptr != camera) delete camera;
 	if (nullptr != entities) delete entities;
 	if (nullptr != pipeline) delete pipeline;
 	if (nullptr != raster) delete raster;
 	if (nullptr != adaptor) delete adaptor;
+	if (nullptr != printer) delete printer;
 	if (nullptr != window)
 	{
 		window->Destroy();
@@ -56,6 +60,7 @@ int Engine::Initialize()
 	int ret = window->Create(L"Test Console API", 800 / 4, 600 / 8, 4, 8);		// low res
 	//int ret = window.Create(L"Test Console API", 1200 / 3, 900 / 6, 3, 6);	// high res
 
+	printer = new ConsoleWindowPrinter(window);
 	adaptor = new ConsoleWindowAdaptor(window);
 	raster = new Rasterizer(adaptor->GetBufferWidth(), adaptor->GetBufferHeight());
 	pipeline = new Pipeline(raster, adaptor);
@@ -177,6 +182,12 @@ int Engine::Run()
 			pipeline->Draw((*task)->mesh);
 		}
 
+		// 
+		for (auto entity = entities->Begin(); entity != entities->End(); ++entity)
+		{
+			(*entity)->OnOverlay();
+		}
+
 		window->Flush();
 		window->SwapBuffers();
 	}
@@ -207,6 +218,17 @@ int Engine::GetMousePositionDeltaX() const
 int Engine::GetMousePositionDeltaY() const
 {
 	return window->GetMousePositionDeltaY();
+}
+
+void Engine::PrintText(int x, int y, const char * string, int attribute)
+{
+	if (nullptr == printer)
+		return;
+
+	if (x < 0) x = adaptor->GetBufferWidth() + x;
+	if (y < 0) y = adaptor->GetBufferHeight() + y;
+
+	printer->Print(x, y, string, attribute);
 }
 
 Entity* Engine::CreateEntity(const char* type)

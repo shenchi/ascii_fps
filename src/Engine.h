@@ -3,6 +3,7 @@
 #include "Camera.h"
 
 class ConsoleWindow;
+class ConsoleWindowPrinter;
 class IColorBufferAdaptor;
 class Rasterizer;
 class Pipeline;
@@ -31,6 +32,8 @@ public:
 	int						GetMousePositionDeltaX() const;
 	int						GetMousePositionDeltaY() const;
 
+	void					PrintText(int x, int y, const char* string, int attribute = 0xff);
+
 	inline Camera*			GetCamera() { return camera; }
 
 	inline EntityManager*	GetEntityManager() { return entities; }
@@ -43,6 +46,7 @@ private:
 	bool					running;
 
 	ConsoleWindow*			window;
+	ConsoleWindowPrinter*	printer;
 	IColorBufferAdaptor*	adaptor;
 	Rasterizer*				raster;
 	Pipeline*				pipeline;
