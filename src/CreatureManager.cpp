@@ -56,7 +56,7 @@ void CreatureManager::SpawnOneEnemy()
 
 	MapManager::instance()->CollideWithMap(spawnX, spawnZ, creature->GetRadius());
 
-	enemy->SetPosition(spawnX, 0.25f, spawnZ);
+	enemy->SetPosition(spawnX, 0.0f, spawnZ);
 
 	enemies.push_back(enemy);
 }

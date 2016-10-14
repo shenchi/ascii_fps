@@ -11,7 +11,6 @@ using namespace glm;
 void SlimeEntity::OnCreate()
 {
 	LoadMeshFromFile("../assets/slime.mesh");
-	SetScale(0.25f, 0.25f, 0.25f);
 	
 	// TEST
 	SetLoop(true);
