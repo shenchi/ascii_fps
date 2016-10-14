@@ -11,7 +11,6 @@ public:
 	virtual ~MeshEntity();
 
 	virtual void LoadMeshFromFile(const char* filename);
-	//void SetMesh(Mesh&& mesh);
 
 protected:
 	virtual RenderTask*	OnRender();

@@ -2,6 +2,7 @@
 
 struct RenderTask;
 class Engine;
+class EntityManager;
 
 class Entity
 {
@@ -14,6 +15,8 @@ public:
 
 	inline bool			Visible() const { return visible; }
 	inline void			SetVisible(bool v) { visible = v; }
+
+	inline void			Destroy() { remove = true; }
 
 	virtual void		OnCreate();
 	virtual void		OnUpdate(float deltaTime);
@@ -52,11 +55,13 @@ public:
 
 protected:
 	friend class Engine;
+	friend class EntityManager;
 
 	virtual RenderTask*	OnRender();
 
 	void		UpdateLocalMatrix();
 	void		UpdateWorldMatrix();
+	void		UpdateRemoveFlag();
 
 protected:
 	Engine*		engine;
@@ -64,6 +69,7 @@ protected:
 
 private:
 	bool		visible;
+	bool		remove;					// this entity will be removed soon
 	bool		dirty;					// if position information of this node changed within this frame
 	bool		modified;				// if matrix have been updated during this frame
 	float		posX, posY, posZ;		// local coordinate

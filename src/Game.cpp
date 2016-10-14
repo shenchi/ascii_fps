@@ -1,16 +1,14 @@
 #include "Game.h"
-
-#include <glm/glm.hpp>
-#include <glm/gtx/transform.hpp>
-#include <cmath>
 #include "Engine.h"
 #include "EntityManager.h"
-#include "DungeonMap.h"
+// TODO
+#include "SkinnedMeshEntity.h"
+#include "MapManager.h"
+
+// for registration
 #include "MapEntity.h"
 #include "PlayerEntity.h"
-#include "Mesh.h"
-#include "MeshEntity.h"
-#include "SkinnedMeshEntity.h"
+#include "FireballEntity.h"
 
 Game::Game()
 	:engine(new Engine())
@@ -30,17 +28,12 @@ int Game::Run()
 
 	entityMgr->Register("MapEntity", []() { return new MapEntity(); });
 	entityMgr->Register("PlayerEntity", []() { return new PlayerEntity(); });
+	entityMgr->Register("FireballEntity", []() { return new FireballEntity(); });
 
-	DungeonMap map;
-	map.Create();
-
-	MapEntity* mapEntity = dynamic_cast<MapEntity*>(engine->CreateEntity("MapEntity"));
-	mapEntity->SetMesh(map.GetMesh());
-	//mapEntity->SetVisible(false);
-
+	MapManager::instance()->CreateMap();
+	
 	PlayerEntity* playerEntity = dynamic_cast<PlayerEntity*>(engine->CreateEntity("PlayerEntity"));
-	playerEntity->SetPosition(map.GetStartPositionX(), 1.0f, map.GetStartPositionY());
-	playerEntity->SetMap(&map);
+	playerEntity->SetPosition(MapManager::instance()->GetStartPositionX(), 1.0f, MapManager::instance()->GetStartPositionY());
 
 	MeshEntity* meshEntity = dynamic_cast<MeshEntity*>(engine->CreateEntity("MeshEntity"));
 	meshEntity->LoadMeshFromFile("../assets/sword.mesh");
@@ -51,7 +44,7 @@ int Game::Run()
 	SkinnedMeshEntity* slime = dynamic_cast<SkinnedMeshEntity*>(engine->CreateEntity("SkinnedMeshEntity"));
 	slime->LoadMeshFromFile("../assets/slime.mesh");
 	slime->SetScale(0.5f, 0.5f, 0.5f);
-	slime->SetPosition(map.GetStartPositionX(), 0.0f, map.GetStartPositionY() + 5.0f);
+	slime->SetPosition(MapManager::instance()->GetStartPositionX(), 0.0f, MapManager::instance()->GetStartPositionY() + 5.0f);
 	slime->SetLoop(true);
 	slime->Play();
 

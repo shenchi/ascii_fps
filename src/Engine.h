@@ -7,9 +7,15 @@ class IColorBufferAdaptor;
 class Rasterizer;
 class Pipeline;
 class EntityManager;
+class ResourceManager;
+
+struct Mesh;
+struct Animation;
 
 class Engine
 {
+public:
+	inline static Engine*	instance() { return _instance; }
 public:
 	Engine();
 	~Engine();
@@ -26,9 +32,12 @@ public:
 	int						GetMousePositionDeltaY() const;
 
 	inline Camera*			GetCamera() { return camera; }
-	Entity*					CreateEntity(const char* type = nullptr);
 
 	inline EntityManager*	GetEntityManager() { return entities; }
+	Entity*					CreateEntity(const char* type = nullptr);
+
+	Mesh*					LoadMesh(const char* filename);
+	Animation*				LoadAnimation(const char* filename);
 
 private:
 	bool					running;
@@ -39,4 +48,8 @@ private:
 	Pipeline*				pipeline;
 	Camera*					camera;
 	EntityManager*			entities;
+	ResourceManager*		resources;
+
+private:
+	static Engine* _instance;
 };

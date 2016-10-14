@@ -1,36 +1,29 @@
 #include "MeshEntity.h"
+
+#include "Engine.h"
 #include "Mesh.h"
 #include "RenderTask.h"
-#include "MeshLoader.h"
 #include <utility>
 
 MeshEntity::MeshEntity()
 	:
-	mesh(new Mesh()),
+	mesh(nullptr),
 	task(new RenderTask())
 {
 	task->worldMatrix = GetWorldMatrix();
-	task->mesh = mesh;
+	task->mesh = nullptr;
 }
 
 MeshEntity::~MeshEntity()
 {
 	delete task;
-	delete mesh;
 }
 
 void MeshEntity::LoadMeshFromFile(const char * filename)
 {
-	if (!MeshLoader::LoadFromFile(filename, mesh, nullptr))
-	{
-		mesh->Clear();
-	}
+	mesh = Engine::instance()->LoadMesh(filename);
+	task->mesh = mesh;
 }
-
-//void MeshEntity::SetMesh(Mesh&& mesh)
-//{
-//	*(this->mesh) = std::forward<Mesh>(mesh);
-//}
 
 RenderTask * MeshEntity::OnRender()
 {

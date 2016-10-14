@@ -110,12 +110,14 @@ float DungeonMap::GetStartPositionY() const
 	return gridSize * (mapGen->EntryY() - mapGen->Top() + 0.5f);
 }
 
-void DungeonMap::MoveInMap(float& destX, float& destY, float radius) const
+bool DungeonMap::MoveInMap(float& destX, float& destY, float radius) const
 {
 	if (nullptr == mapData)
 	{
-		return;
+		return false;
 	}
+
+	bool collided = false;
 
 #define TEST(OFFSET_X, OFFSET_Y, COORD_VAR, GRID_COORD, COORD_OFFSET)\
 	{\
@@ -125,6 +127,7 @@ void DungeonMap::MoveInMap(float& destX, float& destY, float radius) const
 		if (destType != '.')\
 		{\
 			COORD_VAR = (GRID_COORD) * gridSize COORD_OFFSET;\
+			collided = true;\
 		}\
 	}
 
@@ -134,4 +137,6 @@ void DungeonMap::MoveInMap(float& destX, float& destY, float radius) const
 	TEST(, -radius, destY, dy + 1, +radius);
 
 #undef TEST
+
+	return collided;
 }

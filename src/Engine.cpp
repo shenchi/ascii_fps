@@ -5,6 +5,7 @@
 #include "Pipeline.h"
 #include "Shader.h"
 #include "EntityManager.h"
+#include "ResourceManager.h"
 #include "Camera.h"
 #include "RenderTask.h"
 #include "Animation.h"
@@ -17,6 +18,8 @@ namespace
 	typedef std::chrono::high_resolution_clock timer;
 }
 
+Engine* Engine::_instance = nullptr;
+
 Engine::Engine()
 	:
 	running(false),
@@ -25,8 +28,11 @@ Engine::Engine()
 	raster(nullptr),
 	pipeline(nullptr),
 	entities(nullptr),
-	camera(nullptr)
+	camera(nullptr),
+	resources(nullptr)
 {
+	assert(_instance == nullptr);
+	_instance = this;
 }
 
 Engine::~Engine()
@@ -55,6 +61,8 @@ int Engine::Initialize()
 	pipeline = new Pipeline(raster, adaptor);
 
 	entities = new EntityManager();
+
+	resources = new ResourceManager();
 
 	camera = new Camera();
 	camera->SetPerspectiveProjection(45.0f, 0.5f * adaptor->GetBufferWidth() / adaptor->GetBufferHeight(), 0.5f, 80.0f);
@@ -108,6 +116,15 @@ int Engine::Run()
 
 		renderList.clear();
 
+		// Find all entities that need to be removed, and call OnDestroy()
+		for (auto entity = entities->Begin(); entity != entities->End(); ++entity)
+		{
+			(*entity)->UpdateRemoveFlag();
+			if ((*entity)->remove)
+				(*entity)->OnDestroy();
+		}
+		entities->CleanUp();
+
 		// Update
 		for (auto entity = entities->Begin(); entity != entities->End(); ++entity)
 		{
@@ -145,17 +162,18 @@ int Engine::Run()
 		{
 			matWorld = (*reinterpret_cast<const glm::mat4*>((*task)->worldMatrix));
 			matMVP = matVP * matWorld;
+
+
+			pipeline->SetVertexShader(BuiltInShaders::GetVertexShader((*task)->vertexShader));
+			pipeline->SetPixelShader(BuiltInShaders::GetPixelShader((*task)->pixelShader));
+
+			pipeline->SetConstantBuffer(0, reinterpret_cast<float*>(builtInMatrix));
+
 			if ((*task)->pose != nullptr) 
 			{
-				pipeline->SetVertexShader(BuiltInShaders::DefaultSkinnedMeshVertexShader());
-				pipeline->SetConstantBuffer(0, reinterpret_cast<float*>(builtInMatrix));
 				pipeline->SetConstantBuffer(1, (*task)->pose->matrices);
 			}
-			else
-			{
-				pipeline->SetVertexShader(BuiltInShaders::DefaultVertexShader());
-				pipeline->SetConstantBuffer(0, reinterpret_cast<float*>(builtInMatrix));
-			}
+
 			pipeline->Draw((*task)->mesh);
 		}
 
@@ -203,5 +221,15 @@ Entity* Engine::CreateEntity(const char* type)
 	entity->engine = this;
 	entity->OnCreate();
 	return entity;
+}
+
+Mesh * Engine::LoadMesh(const char * filename)
+{
+	return resources->LoadMesh(filename);
+}
+
+Animation * Engine::LoadAnimation(const char * filename)
+{
+	return resources->LoadAnimation(filename);
 }
 

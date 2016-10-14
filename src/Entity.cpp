@@ -10,6 +10,7 @@ Entity::Entity()
 	engine(nullptr),
 	parent(nullptr),
 	visible(true),
+	remove(false),
 	dirty(false),
 	modified(false),
 	posX(0.0f), posY(0.0f), posZ(0.0f),
@@ -129,6 +130,34 @@ void Entity::UpdateWorldMatrix()
 		*reinterpret_cast<glm::mat4*>(stack[i]->worldMatrix) = worldMat;
 		stack[i]->dirty = false;
 		stack[i]->modified = true;
+	}
+}
+
+void Entity::UpdateRemoveFlag()
+{
+	if (remove)
+		return;
+
+	Entity* topmost = nullptr;
+	Entity* p = this;
+
+	while (p != nullptr)
+	{
+		if (p->remove)
+		{
+			topmost = p;
+		}
+		p = p->parent;
+	}
+
+	if (nullptr == topmost)
+		return;
+
+	p = this;
+	while (p != topmost)
+	{
+		p->remove = true;
+		p = p->parent;
 	}
 }
 

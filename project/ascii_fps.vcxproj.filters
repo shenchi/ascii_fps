@@ -71,6 +71,15 @@
     <ClCompile Include="..\src\SkinnedMeshEntity.cpp">
       <Filter>Engine\Entities</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\MapManager.cpp">
+      <Filter>Gameplay</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\FireballEntity.cpp">
+      <Filter>Gameplay</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ResourceManager.cpp">
+      <Filter>Engine</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\Shader.h">
@@ -159,6 +168,15 @@
     </ClInclude>
     <ClInclude Include="..\src\SkinnedMeshEntity.h">
       <Filter>Engine\Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\FireballEntity.h">
+      <Filter>Gameplay</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\MapManager.h">
+      <Filter>Gameplay</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\ResourceManager.h">
+      <Filter>Engine</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

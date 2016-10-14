@@ -1,8 +1,10 @@
 #include "SkinnedMeshEntity.h"
+
+#include "Engine.h"
 #include "RenderTask.h"
 
 #include "Animation.h"
-#include "MeshLoader.h"
+#include "Shader.h"
 
 #include <glm/glm.hpp>
 #include <glm/gtx/transform.hpp>
@@ -10,7 +12,7 @@
 
 SkinnedMeshEntity::SkinnedMeshEntity()
 	:
-	anim(new Animation()),
+	anim(nullptr),
 	pose(new Pose()),
 	currentAction(-1),
 	startFrame(-1),
@@ -24,22 +26,26 @@ SkinnedMeshEntity::SkinnedMeshEntity()
 	playing(false),
 	timeElapsed(0.0f)
 {
+	task->vertexShader = BuiltInShaders::VertexShaderIndex::vsSkinnedMesh;
 	task->pose = pose;
 }
 
 SkinnedMeshEntity::~SkinnedMeshEntity()
 {
-	delete anim;
 	delete pose;
 }
 
 void SkinnedMeshEntity::LoadMeshFromFile(const char * filename)
 {
-	if (!MeshLoader::LoadFromFile(filename, mesh, anim))
-	{
-		mesh->Clear();
+	MeshEntity::LoadMeshFromFile(filename);
+
+	if (nullptr == mesh)
 		return;
-	}
+
+	anim = Engine::instance()->LoadAnimation(filename);
+
+	if (nullptr == anim)
+		return;
 
 	pose->bones.release();
 	pose->matrices.release();

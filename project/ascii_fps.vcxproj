@@ -154,10 +154,12 @@
     <ClCompile Include="..\src\Engine.cpp" />
     <ClCompile Include="..\src\Entity.cpp" />
     <ClCompile Include="..\src\EntityManager.cpp" />
+    <ClCompile Include="..\src\FireballEntity.cpp" />
     <ClCompile Include="..\src\Game.cpp" />
     <ClCompile Include="..\src\main.cpp" />
     <ClCompile Include="..\src\MapEntity.cpp" />
     <ClCompile Include="..\src\MapGenerator.cpp" />
+    <ClCompile Include="..\src\MapManager.cpp" />
     <ClCompile Include="..\src\MapMesh.cpp" />
     <ClCompile Include="..\src\MeshEntity.cpp" />
     <ClCompile Include="..\src\MeshLoader.cpp" />
@@ -167,6 +169,7 @@
     <ClCompile Include="..\src\PixelEmitter.cpp" />
     <ClCompile Include="..\src\PlayerEntity.cpp" />
     <ClCompile Include="..\src\Rasterizer.cpp" />
+    <ClCompile Include="..\src\ResourceManager.cpp" />
     <ClCompile Include="..\src\Shader.cpp" />
     <ClCompile Include="..\src\SkinnedMeshEntity.cpp" />
     <ClCompile Include="..\src\VertexFormat.cpp" />
@@ -183,9 +186,11 @@
     <ClInclude Include="..\src\Engine.h" />
     <ClInclude Include="..\src\Entity.h" />
     <ClInclude Include="..\src\EntityManager.h" />
+    <ClInclude Include="..\src\FireballEntity.h" />
     <ClInclude Include="..\src\Game.h" />
     <ClInclude Include="..\src\MapEntity.h" />
     <ClInclude Include="..\src\MapGenerator.h" />
+    <ClInclude Include="..\src\MapManager.h" />
     <ClInclude Include="..\src\MapMesh.h" />
     <ClInclude Include="..\src\Mesh.h" />
     <ClInclude Include="..\src\MeshEntity.h" />
@@ -197,6 +202,7 @@
     <ClInclude Include="..\src\PlayerEntity.h" />
     <ClInclude Include="..\src\Rasterizer.h" />
     <ClInclude Include="..\src\RenderTask.h" />
+    <ClInclude Include="..\src\ResourceManager.h" />
     <ClInclude Include="..\src\Shader.h" />
     <ClInclude Include="..\src\SkinnedMeshEntity.h" />
     <ClInclude Include="..\src\VertexFormat.h" />

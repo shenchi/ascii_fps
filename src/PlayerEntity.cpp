@@ -1,10 +1,15 @@
 #include "PlayerEntity.h"
-#include "Engine.h"
-#include "DungeonMap.h"
 
+#include "Engine.h"
+#include "MapManager.h"
+#include "FireballEntity.h"
+
+#include <Windows.h>
 #include <glm/glm.hpp>
 #include <glm/gtx/transform.hpp>
 #include <cmath>
+
+using namespace glm;
 
 void PlayerEntity::OnCreate()
 {
@@ -21,8 +26,7 @@ void PlayerEntity::OnUpdate(float deltaTime)
 	constexpr float angle90 = 3.1415926f * 0.5f;
 	float anglePitch = GetRotationX();
 	float angleYaw = GetRotationY();
-	float posX = GetPositionX();
-	float posZ = GetPositionZ();
+	vec3 pos = vec3(GetPositionX(), GetPositionY(), GetPositionZ());
 
 	angleYaw += engine->GetMousePositionDeltaX() * mouseScaleX;
 	anglePitch += engine->GetMousePositionDeltaY() * mouseScaleY;
@@ -33,48 +37,59 @@ void PlayerEntity::OnUpdate(float deltaTime)
 		anglePitch = -angle90;
 
 	if (engine->IsKeyDown('A')) {
-		posX -= deltaTime * stepSpeed * cos(angleYaw);
-		posZ += deltaTime * stepSpeed * sin(angleYaw);
+		pos.x -= deltaTime * stepSpeed * cos(angleYaw);
+		pos.z += deltaTime * stepSpeed * sin(angleYaw);
 	}
 	else if (engine->IsKeyDown('D')) {
-		posX += deltaTime * stepSpeed * cos(angleYaw);
-		posZ -= deltaTime * stepSpeed * sin(angleYaw);
+		pos.x += deltaTime * stepSpeed * cos(angleYaw);
+		pos.z -= deltaTime * stepSpeed * sin(angleYaw);
 	}
 
 	if (engine->IsKeyDown('W'))
 	{
-		posX += deltaTime * stepSpeed * sin(angleYaw);
-		posZ += deltaTime * stepSpeed * cos(angleYaw);
+		pos.x += deltaTime * stepSpeed * sin(angleYaw);
+		pos.z += deltaTime * stepSpeed * cos(angleYaw);
 	}
 	else if (engine->IsKeyDown('S'))
 	{
-		posX -= deltaTime * stepSpeed * sin(angleYaw);
-		posZ -= deltaTime * stepSpeed * cos(angleYaw);
+		pos.x -= deltaTime * stepSpeed * sin(angleYaw);
+		pos.z -= deltaTime * stepSpeed * cos(angleYaw);
 	}
 
-	map->MoveInMap(posX, posZ, 0.7f);
-
-	if (engine->IsKeyDown(27))
-	{
-		engine->Quit();
-	}
+	MapManager::instance()->CollideWithMap(pos.x, pos.z, 0.7f);
 	
-	SetPositionX(posX);
-	SetPositionZ(posZ);
+	SetPositionX(pos.x);
+	SetPositionZ(pos.z);
 	SetRotationX(anglePitch);
 	SetRotationY(angleYaw);
 
 	UpdateWorldMatrix();
 
-	camera->SetViewMatrix(
-		reinterpret_cast<float*>(&(glm::inverse(
-			*reinterpret_cast<const glm::mat4*>(GetWorldMatrix())
-		)))
-	);
-}
+	const mat4& worldMat = *reinterpret_cast<const mat4*>(GetWorldMatrix());
 
-void PlayerEntity::SetMap(DungeonMap * map)
-{
-	this->map = map;
+	camera->SetViewMatrix(reinterpret_cast<float*>(&(inverse(worldMat))));
+
+	// == 
+	if (fireCoolDown > 0.0f)
+	{
+		fireCoolDown -= deltaTime;
+	}
+
+	if (engine->IsKeyDown(VK_LBUTTON) && fireCoolDown <= 0.0f)
+	{
+		fireCoolDown = 0.5f;
+
+		FireballEntity* fireball = dynamic_cast<FireballEntity*>(engine->CreateEntity("FireballEntity"));
+		vec4 worldPos = vec4(pos, 1.0f);
+		vec4 frontPos = worldMat * vec4(0.0f, 0.0f, 1.0f, 1.0f);
+		vec3 dir = normalize(vec3(frontPos - worldPos));
+		fireball->SetPosition(frontPos.x, frontPos.y, frontPos.z);
+		fireball->SetDirection(dir.x, dir.y, dir.z);
+	}
+
+	if (engine->IsKeyDown(27))
+	{
+		engine->Quit();
+	}
 }
 
