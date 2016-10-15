@@ -32,7 +32,7 @@ int Game::Run()
 	entityMgr->Register("FireballEntity", []() { return new FireballEntity(); });
 	entityMgr->Register("SlimeEntity", []() { return new SlimeEntity(); });
 
-	CreaturesData::instance()->Init("../assets/creatures.tsv");
+	CreaturesData::instance()->Init("assets/creatures.tsv");
 
 	GamePlayLogicEntity* gameplay = dynamic_cast<GamePlayLogicEntity*>(engine->CreateEntity("GamePlayLogicEntity"));
 

@@ -14,7 +14,7 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR pCmdLin
 	// test mesh loader
 	Mesh mesh;
 	Animation anim;
-	if (!MeshLoader::LoadFromFile("../assets/slime.mesh", &mesh, &anim))
+	if (!MeshLoader::LoadFromFile("assets/slime.mesh", &mesh, &anim))
 	{
 		MessageBox(nullptr, L"Loading Failed", L"Failed", MB_OK);
 		return -1;

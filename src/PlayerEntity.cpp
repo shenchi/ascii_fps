@@ -23,7 +23,7 @@ void PlayerEntity::OnCreate()
 	turnSpeed = 2.0f;
 
 	MeshEntity* meshEntity = dynamic_cast<MeshEntity*>(engine->CreateEntity("MeshEntity"));
-	meshEntity->LoadMeshFromFile("../assets/sword.mesh");
+	meshEntity->LoadMeshFromFile("assets/sword.mesh");
 	meshEntity->SetParent(this);
 	meshEntity->SetPosition(0.2f, -0.15f, 0.6f);
 	meshEntity->SetScale(0.2f, 0.2f, 0.2f);

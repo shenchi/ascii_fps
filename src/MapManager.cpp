@@ -22,7 +22,7 @@ void MapManager::CreateMap()
 	mapEntity->SetMesh(map->GetMesh());
 
 	ladderEntity = dynamic_cast<MeshEntity*>(Engine::instance()->CreateEntity("MeshEntity"));
-	ladderEntity->LoadMeshFromFile("../assets/ladder.mesh");
+	ladderEntity->LoadMeshFromFile("assets/ladder.mesh");
 	ladderEntity->SetPosition(map->GetEndPositionX(), 0, map->GetEndPositionY());
 }
 

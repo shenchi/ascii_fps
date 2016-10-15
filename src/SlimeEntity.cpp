@@ -10,7 +10,7 @@ using namespace glm;
 
 void SlimeEntity::OnCreate()
 {
-	LoadMeshFromFile("../assets/slime.mesh");
+	LoadMeshFromFile("assets/slime.mesh");
 	SetFrameRate(40);
 }
 

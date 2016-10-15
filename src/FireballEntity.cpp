@@ -22,7 +22,7 @@ FireballEntity::FireballEntity()
 
 void FireballEntity::OnCreate()
 {
-	LoadMeshFromFile("../assets/fireball.mesh");
+	LoadMeshFromFile("assets/fireball.mesh");
 }
 
 void FireballEntity::OnUpdate(float deltaTime)
