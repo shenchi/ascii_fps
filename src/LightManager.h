@@ -26,7 +26,7 @@ public:
 	inline operator Light*() {
 		if (lights.empty())
 			return nullptr;
-		return &lights[0];
+		return lights;
 	}
 
 private:

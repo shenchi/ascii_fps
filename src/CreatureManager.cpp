@@ -29,7 +29,7 @@ void CreatureManager::CreatePlayerEntity()
 
 void CreatureManager::SpawnToMaxCount()
 {
-	while (enemies.size() < maxEnemyCount)
+	while (enemies.size() < size_t(maxEnemyCount))
 	{
 		SpawnOneEnemy();
 	}
@@ -37,7 +37,7 @@ void CreatureManager::SpawnToMaxCount()
 
 void CreatureManager::SpawnOneEnemy()
 {
-	if (enemies.size() > maxEnemyCount)
+	if (enemies.size() > size_t(maxEnemyCount))
 		return;
 
 	uniform_real_distribution<float> distRadius(minSpawnRadius, maxSpawnRadius);

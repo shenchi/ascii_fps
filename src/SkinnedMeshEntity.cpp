@@ -64,8 +64,8 @@ bool SkinnedMeshEntity::SetAction(size_t action)
 	if (action < anim->actions.size())
 	{
 		currentAction = int(action);
-		startFrame = anim->actions[currentAction].startFrame;
-		endFrame = anim->actions[currentAction].endFrame;
+		startFrame = anim->actions[action].startFrame;
+		endFrame = anim->actions[action].endFrame;
 
 		SetFrame(startFrame);
 		return true;
@@ -84,14 +84,14 @@ bool SkinnedMeshEntity::SetFrame(int frame)
 	if (frame == currentFrame)
 		return true;
 
-	Action& action = anim->actions[currentAction];
-	int f = 0;
+	Action& action = anim->actions[static_cast<size_t>(currentAction)];
+	size_t f = 0;
 
-	for (; f < action.keyFrames.size() - 1; ++f)
+	for (; f + 1 < action.keyFrames.size(); ++f)
 	{
 		if (frame >= static_cast<int>(action.keyFrames[f].frame) && frame <= static_cast<int>(action.keyFrames[f + 1].frame))
 		{
-			currentSection = f;
+			currentSection = static_cast<int>(f);
 			sectionStart = action.keyFrames[f].frame;
 			sectionEnd = action.keyFrames[f + 1].frame;
 			currentFrame = frame;
@@ -129,8 +129,8 @@ bool SkinnedMeshEntity::AdvanceFrame()
 	if (currentAction < 0 || startFrame < 0 || endFrame < 0 || currentSection < 0)
 		return false;
 
-	Action& action = anim->actions[currentAction];
-	size_t numKeyFrames = action.keyFrames.size();
+	Action& action = anim->actions[static_cast<size_t>(currentAction)];
+	int numKeyFrames = static_cast<int>(action.keyFrames.size());
 
 	int newFrame = currentFrame + 1;
 	
@@ -148,8 +148,8 @@ bool SkinnedMeshEntity::AdvanceFrame()
 		}
 
 		currentSection++;
-		sectionStart = action.keyFrames[currentSection].frame;
-		sectionEnd = action.keyFrames[currentSection + 1].frame;
+		sectionStart = action.keyFrames[static_cast<size_t>(currentSection)].frame;
+		sectionEnd = action.keyFrames[static_cast<size_t>(currentSection) + 1].frame;
 	}
 
 	currentFrame = newFrame;
@@ -164,7 +164,7 @@ void SkinnedMeshEntity::UpdatePose()
 		return;
 
 	ArrayBuffer<int>& bones = anim->bones;
-	Action& action = anim->actions[currentAction];
+	Action& action = anim->actions[static_cast<size_t>(currentAction)];
 
 	float t = 0.0f;
 	if (sectionStart != sectionEnd)
@@ -172,16 +172,17 @@ void SkinnedMeshEntity::UpdatePose()
 		t = (float)(currentFrame - sectionStart) / (sectionEnd - sectionStart);
 	}
 
-	for (int i = 0; i < bones.size(); ++i)
+	for (size_t i = 0; i < bones.size(); ++i)
 	{
-		glm::vec3& T1 = *reinterpret_cast<glm::vec3*>(&action.keyFrames[currentSection].bones[i].x);
-		glm::vec3& T2 = *reinterpret_cast<glm::vec3*>(&action.keyFrames[currentSection + 1].bones[i].x);
+		size_t f = static_cast<size_t>(currentSection);
+		glm::vec3& T1 = *reinterpret_cast<glm::vec3*>(&action.keyFrames[f].bones[i].x);
+		glm::vec3& T2 = *reinterpret_cast<glm::vec3*>(&action.keyFrames[f + 1].bones[i].x);
 
-		glm::quat& R1 = *reinterpret_cast<glm::quat*>(&action.keyFrames[currentSection].bones[i].qx);
-		glm::quat& R2 = *reinterpret_cast<glm::quat*>(&action.keyFrames[currentSection + 1].bones[i].qx);
+		glm::quat& R1 = *reinterpret_cast<glm::quat*>(&action.keyFrames[f].bones[i].qx);
+		glm::quat& R2 = *reinterpret_cast<glm::quat*>(&action.keyFrames[f + 1].bones[i].qx);
 
-		glm::vec3& S1 = *reinterpret_cast<glm::vec3*>(&action.keyFrames[currentSection].bones[i].sx);
-		glm::vec3& S2 = *reinterpret_cast<glm::vec3*>(&action.keyFrames[currentSection + 1].bones[i].sx);
+		glm::vec3& S1 = *reinterpret_cast<glm::vec3*>(&action.keyFrames[f].bones[i].sx);
+		glm::vec3& S2 = *reinterpret_cast<glm::vec3*>(&action.keyFrames[f + 1].bones[i].sx);
 
 		glm::vec3& T = *reinterpret_cast<glm::vec3*>(&pose->bones[i].x);
 		glm::quat& R = *reinterpret_cast<glm::quat*>(&pose->bones[i].qx);
@@ -197,7 +198,7 @@ void SkinnedMeshEntity::UpdatePose()
 		int parent = bones[i];
 		if (parent >= 0)
 		{
-			glm::mat4& matP = *reinterpret_cast<glm::mat4*>(&pose->matrices[parent * 16]);
+			glm::mat4& matP = *reinterpret_cast<glm::mat4*>(&pose->matrices[static_cast<size_t>(parent) * 16]);
 			mat = matP * mat;
 		}
 	}

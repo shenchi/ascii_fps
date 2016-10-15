@@ -16,7 +16,7 @@ void MapMesh::CreateFromGridMap(const char* map, int width, int height, const ch
 	unordered_map<char, size_t> density;
 	typedef unordered_map<char, size_t>::iterator iter_type;
 
-	for (size_t i = 0; i < nTileTypes; ++i)
+	for (size_t i = 0; i < size_t(nTileTypes); ++i)
 	{
 		density.insert({ tileTypes[i], i });
 	}

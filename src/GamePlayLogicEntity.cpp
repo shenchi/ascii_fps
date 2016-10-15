@@ -143,7 +143,7 @@ void GamePlayLogicEntity::UpdateWinScreen()
 	Engine::instance()->PrintText(0, 20, "Congratulations", true, color);
 
 	Engine::instance()->PrintText(0, 40, "you successfully  ", true, color);
-	Engine::instance()->PrintText(0, 50, "   find a way ouy.", true, color);
+	Engine::instance()->PrintText(0, 50, "   find a way out.", true, color);
 }
 
 void GamePlayLogicEntity::UpdateLoseScreen()
