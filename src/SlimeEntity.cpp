@@ -53,6 +53,12 @@ void SlimeEntity::OnUpdate(float deltaTime)
 		vec2 delta = playerPos - pos;
 		vec2 dir = normalize(delta);
 
+		if (length(delta) > 60.0f)
+		{
+			CreatureManager::instance()->KillEnemy(this);
+		}
+
+
 		pos += dir * Speed * deltaTime;
 
 		HitInfo hitInfo;
