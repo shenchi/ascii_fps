@@ -13,11 +13,16 @@ public:
 	virtual void OnUpdate(float deltaTime);
 	virtual void OnOverlay();
 
+	virtual void OnDamage(int damage);
+	virtual void OnDie();
+	virtual void OnHit(HitInfo* hitInfo);
 private:
 	Camera*		camera;
 	float		turnSpeed;
-	float		stepSpeed;
 	float		mouseScaleX;
 	float		mouseScaleY;
 	float		fireCoolDown;
+	float		recoverTimer;
+	float		flyingTimer;
+	float		flyingDirX, flyingDirY, flyingDirZ;
 };

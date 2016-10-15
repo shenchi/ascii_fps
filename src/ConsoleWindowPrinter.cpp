@@ -1,10 +1,18 @@
 #include "ConsoleWindowPrinter.h"
 
 #include "ConsoleWindow.h"
+#include "AsciiGrayScale.h"
+
+//#define HALF_HEIGHT_MODE
 
 #define I_KNOW_I_AM_INCLUDING_FONT
 #include "font.h"
 
+#ifdef HALF_HEIGHT_MODE
+constexpr int fontHeight = 4;
+#else
+constexpr int fontHeight = 8;
+#endif
 
 ConsoleWindowPrinter::ConsoleWindowPrinter(ConsoleWindow * window)
 	:
@@ -14,30 +22,36 @@ ConsoleWindowPrinter::ConsoleWindowPrinter(ConsoleWindow * window)
 	bufferHeight = static_cast<int>(window->GetBufferHeight());
 }
 
-void ConsoleWindowPrinter::Print(int x, int y, char ch, int attribute, bool half)
+void ConsoleWindowPrinter::Print(int x, int y, char ch, const float* color)
 {
 	if (x < 0 || x >= bufferWidth || y < 0 || y >= bufferHeight || ch < 0)
 		return;
 
-	const int height = (half ? 4 : 8);
-	const char *p = (half ? bmFont_Half : bmFont) + (ch * height * 8);
+	const char *p = bmFont + (ch * fontHeight * 8);
 
-	for (int j = 0; j < height; j++)
+	for (int j = 0; j < fontHeight; j++)
 	{
 		for (int i = 0; i < 8; i++)
 		{
+			unsigned short attr = 0xf;
 			char code = *(p++);
 			int sx = x + i, sy = y + j;
 			if (sx >= bufferWidth || sy >= bufferHeight)
 				continue;
 			if (code == ' ')
 				continue;
-			window->SetColor(sx, sy, attribute, code);
+
+			if (nullptr != color)
+			{
+				AsciiGrayScale::ConvertRGBToAscii(color, code, attr);
+			}
+
+			window->SetColor(sx, sy, attr, code);
 		}
 	}
 }
 
-void ConsoleWindowPrinter::Print(int x, int y, const char* string, int attribute)
+void ConsoleWindowPrinter::Print(int x, int y, const char* string, const float* color)
 {
 	if (x < 0 || x >= bufferWidth || y < 0 || y >= bufferHeight)
 		return;
@@ -45,8 +59,13 @@ void ConsoleWindowPrinter::Print(int x, int y, const char* string, int attribute
 	const char* p = string;
 	while (*p != 0)
 	{
-		Print(x, y, *p, attribute, false);
+		Print(x, y, *p, color);
 		x += 8;
 		++p;
 	}
+}
+
+int ConsoleWindowPrinter::FontHeight()
+{
+	return fontHeight;
 }

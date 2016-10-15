@@ -13,6 +13,10 @@ void MapManager::CreateMap()
 		return;
 
 	map = new DungeonMap();
+	if (seed != 0)
+	{
+		map->SetSeed(seed);
+	}
 	map->Create();
 	mapEntity = dynamic_cast<MapEntity*>(Engine::instance()->CreateEntity("MapEntity"));
 	mapEntity->SetMesh(map->GetMesh());
@@ -28,8 +32,14 @@ void MapManager::DestroyMap()
 		return;
 
 	delete map;
+	map = nullptr;
 	mapEntity->Destroy();
 	ladderEntity->Destroy();
+}
+
+void MapManager::SetVisible(bool visible)
+{
+	mapEntity->SetVisible(visible);
 }
 
 float MapManager::GetStartPositionX() const

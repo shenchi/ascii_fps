@@ -13,10 +13,13 @@ public:
 	inline Entity*		GetParent() { return parent; }
 	inline void			SetParent(Entity* entity) { parent = entity; dirty = true; }
 
+	inline bool			Enabled() const { return enable; }
+	inline bool			Enable(bool e) { enable = e; }
+
 	inline bool			Visible() const { return visible; }
 	inline void			SetVisible(bool v) { visible = v; }
 
-	inline void			Destroy() { remove = true; }
+	inline void			Destroy() { remove = true; enable = false; visible = false; }
 
 	virtual void		OnCreate();
 	virtual void		OnUpdate(float deltaTime);
@@ -69,6 +72,7 @@ protected:
 	Entity*		parent;
 
 private:
+	bool		enable;
 	bool		visible;
 	bool		remove;					// this entity will be removed soon
 	bool		dirty;					// if position information of this node changed within this frame

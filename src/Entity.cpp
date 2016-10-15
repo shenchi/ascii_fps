@@ -9,6 +9,7 @@ Entity::Entity()
 	:
 	engine(nullptr),
 	parent(nullptr),
+	enable(true),
 	visible(true),
 	remove(false),
 	dirty(false),

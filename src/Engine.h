@@ -34,7 +34,7 @@ public:
 	int						GetMousePositionDeltaX() const;
 	int						GetMousePositionDeltaY() const;
 
-	void					PrintText(int x, int y, const char* string, int attribute = 0xff);
+	void					PrintText(int x, int y, const char* string, bool hcentered = false, const float* color = nullptr);
 
 	inline Camera*			GetCamera() { return camera; }
 

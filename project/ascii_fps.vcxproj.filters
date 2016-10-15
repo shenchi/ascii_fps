@@ -95,6 +95,9 @@
     <ClCompile Include="..\src\CreatureManager.cpp">
       <Filter>Gameplay</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\GamePlayLogicEntity.cpp">
+      <Filter>Gameplay</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\Shader.h">
@@ -218,6 +221,9 @@
       <Filter>Gameplay</Filter>
     </ClInclude>
     <ClInclude Include="..\src\CreatureManager.h">
+      <Filter>Gameplay</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\GamePlayLogicEntity.h">
       <Filter>Gameplay</Filter>
     </ClInclude>
   </ItemGroup>

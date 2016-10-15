@@ -42,6 +42,11 @@ DungeonMap::~DungeonMap()
 	}
 }
 
+void DungeonMap::SetSeed(unsigned int seed)
+{
+	mapGen->SetSeed(seed);
+}
+
 void DungeonMap::Create()
 {
 	if (nullptr != mapData)

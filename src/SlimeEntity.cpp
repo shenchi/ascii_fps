@@ -11,27 +11,88 @@ using namespace glm;
 void SlimeEntity::OnCreate()
 {
 	LoadMeshFromFile("../assets/slime.mesh");
-	
-	// TEST
-	SetLoop(true);
-	Play();
+	SetFrameRate(40);
 }
 
 void SlimeEntity::OnUpdate(float deltaTime)
 {
-	PlayerEntity* player = CreatureManager::instance()->GetPlayerEntity();
-	vec2 playerPos = vec2(player->GetPositionX(), player->GetPositionZ());
-	vec2 pos = vec2(GetPositionX(), GetPositionZ());
+	if (attackCoolDown > 0.0f)
+	{
+		attackCoolDown -= deltaTime;
+	}
 
-	vec2 delta = playerPos - pos;
-	vec2 dir = normalize(delta);
+	if (flyingTimer > 0.0f)
+	{
+		flyingTimer -= deltaTime;
 
-	pos += dir * Speed * deltaTime;
+		vec2 pos = vec2(GetPositionX(), GetPositionZ());
+		vec2 dir = vec2(flyingDirX, flyingDirZ);
+		pos += dir * 5.0f * deltaTime;
+		MapManager::instance()->CollideWithMap(pos.x, pos.y, Radius);
+		SetPositionX(pos.x);
+		SetPositionZ(pos.y);
+		return;
+	}
+	if (!IsPlaying())
+	{
+		jumpCoolDown -= deltaTime;
 
-	MapManager::instance()->CollideWithMap(pos.x, pos.y, Radius);
+		if (jumpCoolDown < 0.0f)
+		{
+			Rewind();
+			Play();
+			jumpCoolDown = 1.0f;
+		}
+	}
+	else
+	{
+		PlayerEntity* player = CreatureManager::instance()->GetPlayerEntity();
+		vec2 playerPos = vec2(player->GetPositionX(), player->GetPositionZ());
+		vec2 pos = vec2(GetPositionX(), GetPositionZ());
 
-	SetPositionX(pos.x);
-	SetPositionZ(pos.y);
+		vec2 delta = playerPos - pos;
+		vec2 dir = normalize(delta);
+
+		pos += dir * Speed * deltaTime;
+
+		HitInfo hitInfo;
+		if (attackCoolDown <= 0.0f && CreatureManager::instance()->CollideWithPlayer(
+			GetPositionX(), GetPositionY(), GetPositionZ(), Radius, &hitInfo))
+		{
+			attackCoolDown = 2.0f;
+			Attack(player);
+			hitInfo.dirX = -dir.x;
+			hitInfo.dirY = 0;
+			hitInfo.dirZ = -dir.y;
+			player->OnHit(&hitInfo);
+			hitInfo.dirX = dir.x;
+			hitInfo.dirY = 0;
+			hitInfo.dirZ = dir.y;
+			OnHit(&hitInfo);
+		}
+
+		MapManager::instance()->CollideWithMap(pos.x, pos.y, Radius);
+
+		SetPositionX(pos.x);
+		SetPositionZ(pos.y);
+	}
 
 	SkinnedMeshEntity::OnUpdate(deltaTime);
+}
+
+void SlimeEntity::OnDamage(int damage)
+{
+}
+
+void SlimeEntity::OnDie()
+{
+	CreatureManager::instance()->KillEnemy(this);
+}
+
+void SlimeEntity::OnHit(HitInfo * hitInfo)
+{
+	flyingTimer = 0.5f;
+	flyingDirX = -hitInfo->dirX;
+	flyingDirY = -hitInfo->dirY;
+	flyingDirZ = -hitInfo->dirZ;
 }

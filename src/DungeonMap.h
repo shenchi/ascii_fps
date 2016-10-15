@@ -9,6 +9,8 @@ public:
 	DungeonMap();
 	~DungeonMap();
 
+	void SetSeed(unsigned int seed);
+
 	void Create();
 
 	float GetStartPositionX() const;

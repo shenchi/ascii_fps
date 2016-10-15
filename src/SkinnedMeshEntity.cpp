@@ -140,6 +140,7 @@ bool SkinnedMeshEntity::AdvanceFrame()
 		{
 			if (!loop)
 			{
+				playing = false;
 				return false;
 			}
 			currentSection = -1;

@@ -14,6 +14,7 @@
 #include <chrono>
 #include <vector>
 #include <glm/glm.hpp>
+#include <cstring>
 
 namespace
 {
@@ -136,6 +137,9 @@ int Engine::Run()
 		// Update
 		for (auto entity = entities->Begin(); entity != entities->End(); ++entity)
 		{
+			if (!(*entity)->enable)
+				continue;
+
 			(*entity)->OnUpdate(deltaTime);
 		}
 
@@ -224,15 +228,29 @@ int Engine::GetMousePositionDeltaY() const
 	return window->GetMousePositionDeltaY();
 }
 
-void Engine::PrintText(int x, int y, const char * string, int attribute)
+void Engine::PrintText(int x, int y, const char * string, bool hcentered, const float* color)
 {
 	if (nullptr == printer)
 		return;
 
-	if (x < 0) x = adaptor->GetBufferWidth() + x;
-	if (y < 0) y = adaptor->GetBufferHeight() + y;
+	const int bufferWidth = adaptor->GetBufferWidth();
+	const int bufferHeight = adaptor->GetBufferHeight();
 
-	printer->Print(x, y, string, attribute);
+	if (x < 0) x = bufferWidth + x;
+	if (y < 0) y = bufferHeight + y;
+
+	if (hcentered)
+	{
+		int w = printer->FontWidth();
+		int len = static_cast<int>(strlen(string));
+		int wtotal = w * len;
+		if (wtotal <= bufferWidth)
+		{
+			x = (bufferWidth - wtotal) / 2;
+		}
+	}
+
+	printer->Print(x, y, string, color);
 }
 
 Entity* Engine::CreateEntity(const char* type)

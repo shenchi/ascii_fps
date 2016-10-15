@@ -160,6 +160,7 @@
     <ClCompile Include="..\src\EntityManager.cpp" />
     <ClCompile Include="..\src\FireballEntity.cpp" />
     <ClCompile Include="..\src\Game.cpp" />
+    <ClCompile Include="..\src\GamePlayLogicEntity.cpp" />
     <ClCompile Include="..\src\main.cpp" />
     <ClCompile Include="..\src\MapEntity.cpp" />
     <ClCompile Include="..\src\MapGenerator.cpp" />
@@ -199,6 +200,7 @@
     <ClInclude Include="..\src\FireballEntity.h" />
     <ClInclude Include="..\src\font.h" />
     <ClInclude Include="..\src\Game.h" />
+    <ClInclude Include="..\src\GamePlayLogicEntity.h" />
     <ClInclude Include="..\src\Light.h" />
     <ClInclude Include="..\src\LightManager.h" />
     <ClInclude Include="..\src\MapEntity.h" />

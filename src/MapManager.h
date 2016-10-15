@@ -16,9 +16,12 @@ public:
 	}
 
 public:
+	inline void	SetSeed(unsigned int seed) { this->seed = seed; }
 
 	void	CreateMap();
 	void	DestroyMap();
+
+	void	SetVisible(bool visible);
 
 	float	GetStartPositionX() const;
 	float	GetStartPositionY() const;
@@ -33,6 +36,7 @@ private:
 	DungeonMap*			map;
 	MapEntity*			mapEntity;
 	MeshEntity*			ladderEntity;
+	unsigned int		seed = 0;
 
 private:
 	static MapManager*	_instance;

@@ -21,6 +21,7 @@ public:
 	inline void		Rewind() { SetFrame(startFrame); }
 	inline void		Play() { playing = true; }
 	inline void		Stop() { playing = false; }
+	inline bool		IsPlaying() const { return playing; }
 
 	virtual void	OnUpdate(float delta_time);
 
